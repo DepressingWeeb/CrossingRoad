@@ -25,7 +25,16 @@ Character::Character(SDL_Renderer* renderer, vector<vector<LTexture*>>& textureF
 	this->frameCounter_ = 0;
 	this->renderer = renderer;
 }
-
+void Character::checkCollision(const vector<AnimatingObject>& v) {
+    SDL_Rect characterRect = { x,y,width,height };
+    for (auto obj : v) {
+        SDL_Rect objRect = obj.boundingRect();
+        if (SDL_HasIntersection(&characterRect, &objRect)) {
+            isDeath = true;
+            break;
+        }
+    }
+}
 void Character::updateDirection() {
     int currDir = -1;
     const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
@@ -71,8 +80,11 @@ void Character::updateDirection() {
 }
 
 void Character::updateCoordinate() {
-    updateDirection();
-    if (!isMoving) return;
+    
+    if (!isMoving) { 
+        currentFrame_ = 0;
+        return; 
+    }
     frameCounter_++;
     if (frameCounter_ >= frameDuration_) {
         currentFrame_ = (currentFrame_ + 1) % numFrames_;
@@ -81,6 +93,19 @@ void Character::updateCoordinate() {
     x += xChange[direction];
     y += yChange[direction];
     
+}
+
+void Character::updateIfDeath() {
+    if (isDeath) {
+        isDeath = false;
+        x = 500;
+        y = 610;
+    }
+}
+void Character::updateAll() {
+    updateIfDeath();
+    updateDirection();//check for keyboard event and update direction accordingly
+    updateCoordinate();//change the frame and update coordinate of character
 }
 void Character::Draw() {
     frames[direction][currentFrame_]->render(x, y, NULL, width, height);

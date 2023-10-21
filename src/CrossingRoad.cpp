@@ -35,8 +35,9 @@ int main(int argn, char** argv)
 		string path = "../../../resources/character/"+(i<10? "tile00" + to_string(i) + ".png": "tile0" + to_string(i) + ".png");
 		framesCharacter[i / 4][i % 4] = new LTexture(gRenderer, path);
 	}
-	Character player(gRenderer, framesCharacter, frames.size(),10, 300, 610, -1, -1, 2);
+	Character player(gRenderer, framesCharacter, frames.size(),10, 300, 610, 32, 32, 2);
 	SDL_Texture* lane = IMG_LoadTexture(gRenderer, "../../../resources/pack/Levels/summer_road.png");
+	
 	bool quit = false;
 	while (!quit) {
 		SDL_RenderClear(gRenderer);
@@ -52,7 +53,12 @@ int main(int argn, char** argv)
 		spacescraft2.Draw();
 		spacescraft3.Update();
 		spacescraft3.Draw();
-		player.updateCoordinate();
+		vector<AnimatingObject> obj;
+		obj.push_back(spacescraft1);
+		obj.push_back(spacescraft2);
+		obj.push_back(spacescraft3);
+		player.checkCollision(obj);
+		player.updateAll();
 		player.Draw();
 		if (SDL_PollEvent(&e)) {
 			switch (e.type) {

@@ -7,7 +7,7 @@ public:
 
     void Update();
     void Draw();
-
+    SDL_Rect boundingRect();
 private:
     int x;
     int y;

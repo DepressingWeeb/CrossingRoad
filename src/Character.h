@@ -1,5 +1,6 @@
 #pragma once
 #include "Texture.h"
+#include "AnimatingObject.h"
 #include <vector>
 class Character {
 private:
@@ -21,8 +22,11 @@ private:
 	SDL_Renderer* renderer;
 public:
 	Character(SDL_Renderer* renderer, vector<vector<LTexture*>>& textureFrames, int numFrames, int frameDuration, int x, int y, int width, int height, int speed);
+	void checkCollision(const vector<AnimatingObject>& v);
 	void updateDirection();
 	void updateCoordinate();
+	void updateIfDeath();
+	void updateAll();
 	void Draw();
 
 };

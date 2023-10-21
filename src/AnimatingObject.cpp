@@ -17,7 +17,9 @@ AnimatingObject::AnimatingObject(SDL_Renderer* renderer, vector<LTexture*>& text
         this->height = textureFrames[0]->getHeight();
     }
 }
-
+SDL_Rect AnimatingObject::boundingRect() {
+        return { x+width/4,y+height/4,width-width/4,height-height/4 };//May need to edit to set hit box manually in the future
+}
 void AnimatingObject::Update() {
     frameCounter_++;
     if (frameCounter_ >= frameDuration_) {
