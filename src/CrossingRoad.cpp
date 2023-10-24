@@ -20,7 +20,6 @@ void init() {
 int main(int argn, char** argv)
 {
 	init();
-	
 	SDL_Event e;
 	SDL_Rect rect;
 	vector<LTexture*> frames;
@@ -35,9 +34,9 @@ int main(int argn, char** argv)
 		string path = "../../../resources/character/"+(i<10? "tile00" + to_string(i) + ".png": "tile0" + to_string(i) + ".png");
 		framesCharacter[i / 4][i % 4] = new LTexture(gRenderer, path);
 	}
-	Character player(gRenderer, framesCharacter, frames.size(),10, 300, 610, 32, 32, 2);
+	Character player(gRenderer, framesCharacter, frames.size(),10, 300, 610, 32, 32, 1);
 	SDL_Texture* lane = IMG_LoadTexture(gRenderer, "../../../resources/pack/Levels/summer_road.png");
-	
+	LTexture* newTexture = new LTexture(gRenderer, "../../../resources/vehicle/spacecraft/tile000.png");
 	bool quit = false;
 	while (!quit) {
 		SDL_RenderClear(gRenderer);
@@ -47,6 +46,7 @@ int main(int argn, char** argv)
 			rect = { i*100,500,100,100 };
 			SDL_RenderCopy(gRenderer, lane, NULL, &rect);
 		}
+		//newTexture->render(0, 0, NULL, -1, -1);
 		spacescraft1.Update();
 		spacescraft1.Draw();
 		spacescraft2.Update();

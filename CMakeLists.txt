@@ -11,12 +11,16 @@ endif()
 
 project ("CrossingRoad")
 set(SOURCES
-    src/CrossingRoad.h
+    include/CrossingRoad.h
     src/CrossingRoad.cpp
-    src/Texture.h
+    include/Texture.h
     src/Texture.cpp
-    src/AnimatingObject.h
+    include/AnimatingObject.h
     src/AnimatingObject.cpp
+    include/global.h
+    src/global.cpp
+    include/Character.h
+    src/Character.cpp
 )
 set(SDL2_DIR
     include/vclib/sdl2/cmake
@@ -27,9 +31,8 @@ set(SDL2_image_DIR
 set(SDL2_ttf_DIR
     include/vclib/sdl2ttf/cmake
 )
-
 # Add source to this project's executable.
-add_executable (CrossingRoad ${SOURCES} "src/global.h" "src/global.cpp" "src/Character.h" "src/Character.cpp")
+add_executable (CrossingRoad ${SOURCES})
 target_include_directories(CrossingRoad
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/vclib/SDL2::SDL2
