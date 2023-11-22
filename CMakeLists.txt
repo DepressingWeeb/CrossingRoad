@@ -21,6 +21,8 @@ set(SOURCES
     src/global.cpp
     include/Character.h
     src/Character.cpp
+    include/ResourceManager.h
+    src/ResourceManager.cpp
 )
 set(SDL2_DIR
     include/vclib/sdl2/cmake
@@ -31,8 +33,8 @@ set(SDL2_image_DIR
 set(SDL2_ttf_DIR
     include/vclib/sdl2ttf/cmake
 )
-# Add source to this project's executable.
-add_executable (CrossingRoad ${SOURCES})
+# Add source to this project's executab "src/ResourceManager.cpp"le.
+add_executable (CrossingRoad ${SOURCES} "include/road.h" "src/road.cpp" "include/RandomLevelGenerator.h" "src/RandomLevelGenerator.cpp")
 target_include_directories(CrossingRoad
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/vclib/SDL2::SDL2

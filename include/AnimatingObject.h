@@ -3,7 +3,7 @@
 #include <vector>
 class AnimatingObject {
 public:
-    AnimatingObject(SDL_Renderer* renderer, vector<LTexture*>& textureFrames, int numFrames, int frameDuration,int x,int y,int width,int height,int speed);
+    AnimatingObject(SDL_Renderer* renderer, vector<LTexture*> textureFrames, int numFrames, int frameDuration,int x,int y,int width,int height,int speed,double scale=1.0);
 
     void Update();
     void Draw();

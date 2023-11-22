@@ -1,6 +1,6 @@
 #include "AnimatingObject.h"
 #include "global.h"
-AnimatingObject::AnimatingObject(SDL_Renderer* renderer, vector<LTexture*>& textureFrames, int numFrames, int frameDuration,int x,int y,int width,int height,int speed) {
+AnimatingObject::AnimatingObject(SDL_Renderer* renderer, vector<LTexture*> textureFrames, int numFrames, int frameDuration,int x,int y,int width,int height,int speed,double scale) {
     this->renderer = renderer;
     frames_ = textureFrames;
     numFrames_ = numFrames;
@@ -10,15 +10,15 @@ AnimatingObject::AnimatingObject(SDL_Renderer* renderer, vector<LTexture*>& text
     this->x = x;
     this->y = y;
     this->speed = speed;
-    this->width = width;
-    this->height = height;
+    this->width = static_cast<double>(width)*scale;
+    this->height = static_cast<double>(height)*scale;
     if (width == -1) {
-        this->width = textureFrames[0]->getWidth();
-        this->height = textureFrames[0]->getHeight();
+        this->width = static_cast<double>(textureFrames[0]->getWidth())*scale;
+        this->height = static_cast<double>(textureFrames[0]->getHeight())*scale;
     }
 }
 SDL_Rect AnimatingObject::boundingRect() {
-        return { x+width/4,y+height/4,width-width/4,height-height/4 };//May need to edit to set hit box manually in the future
+        return { x,y,width,height };//May need to edit to set hit box manually in the future
 }
 void AnimatingObject::Update() {
     frameCounter_++;

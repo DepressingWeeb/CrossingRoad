@@ -25,10 +25,10 @@ Character::Character(SDL_Renderer* renderer, vector<vector<LTexture*>>& textureF
 	this->frameCounter_ = 0;
 	this->renderer = renderer;
 }
-void Character::checkCollision(const vector<AnimatingObject>& v) {
+void Character::checkCollision(const vector<AnimatingObject*> v) {
     SDL_Rect characterRect = { x,y,width,height };
     for (auto obj : v) {
-        SDL_Rect objRect = obj.boundingRect();
+        SDL_Rect objRect = obj->boundingRect();
         if (SDL_HasIntersection(&characterRect, &objRect)) {
             isDeath = true;
             break;
@@ -98,8 +98,10 @@ void Character::updateCoordinate() {
 void Character::updateIfDeath() {
     if (isDeath) {
         isDeath = false;
-        x = 500;
-        y = 610;
+        x = SCREEN_WIDTH/2;
+        y = SCREEN_HEIGHT-height-10;
+        //TODO:
+        //Need to update death event in the future
     }
 }
 void Character::updateAll() {
@@ -109,4 +111,13 @@ void Character::updateAll() {
 }
 void Character::Draw() {
     frames[direction][currentFrame_]->render(x, y, NULL, width, height);
+}
+
+SDL_Rect Character::getBoundingRect() {
+    return { x,y,width,height };
+}
+
+void Character::setCoordinate(int x, int y) {
+    this->x = x;
+    this->y = y;
 }

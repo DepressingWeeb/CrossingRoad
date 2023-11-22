@@ -39,7 +39,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/Acer/source/repos/CrossingRoad/out/build/x64-debug"
+			"value" : "d:/source/repos/CrossingRoad/out/build/x64-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -467,7 +467,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Acer/source/repos/CrossingRoad/out/build/x64-debug/CMakeFiles/pkgRedirects"
+			"value" : "D:/source/repos/CrossingRoad/out/build/x64-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -527,7 +527,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/Acer/source/repos/CrossingRoad"
+			"value" : "D:/source/repos/CrossingRoad"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -539,7 +539,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "C:/Users/Acer/source/repos/CrossingRoad/out/install/x64-debug"
+			"value" : "D:/source/repos/CrossingRoad/out/install/x64-debug"
 		},
 		{
 			"name" : "CMAKE_LINKER",
@@ -1075,7 +1075,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Acer/source/repos/CrossingRoad/out/build/x64-debug"
+			"value" : "D:/source/repos/CrossingRoad/out/build/x64-debug"
 		},
 		{
 			"name" : "CrossingRoad_IS_TOP_LEVEL",
@@ -1099,55 +1099,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Acer/source/repos/CrossingRoad"
-		},
-		{
-			"name" : "SDL2::SDL2_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for SDL2::SDL2."
-				}
-			],
-			"type" : "PATH",
-			"value" : "SDL2::SDL2_DIR-NOTFOUND"
-		},
-		{
-			"name" : "SDL2_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for SDL2."
-				}
-			],
-			"type" : "PATH",
-			"value" : "SDL2_DIR-NOTFOUND"
-		},
-		{
-			"name" : "SDL2_image_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for SDL2_image."
-				}
-			],
-			"type" : "PATH",
-			"value" : "SDL2_image_DIR-NOTFOUND"
-		},
-		{
-			"name" : "SDL2_ttf_DIR",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "The directory containing a CMake configuration file for SDL2_ttf."
-				}
-			],
-			"type" : "PATH",
-			"value" : "SDL2_ttf_DIR-NOTFOUND"
+			"value" : "D:/source/repos/CrossingRoad"
 		},
 		{
 			"name" : "SDL2main_DIR",

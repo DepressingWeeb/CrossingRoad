@@ -63,10 +63,8 @@ void LTexture::render(int x, int y, SDL_Rect* clip, int width , int height , SDL
 	}
 
 	//Render to screen
-	if(mTexture==NULL)	cout << x << " " << y << " " << mWidth << " " << mHeight << endl;
 	SDL_RenderCopyEx(gRenderer, mTexture, clip, &renderQuad, angle, center, flip);
 }
-
 int LTexture::getWidth()
 {
 	return mWidth;

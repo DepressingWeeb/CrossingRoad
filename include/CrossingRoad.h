@@ -10,4 +10,6 @@
 #include "Texture.h"
 #include "AnimatingObject.h"
 #include "Character.h"
+#include "ResourceManager.h"
+
 // TODO: Reference additional headers your program requires here.
