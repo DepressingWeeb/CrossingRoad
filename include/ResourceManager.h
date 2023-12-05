@@ -10,6 +10,15 @@ enum class ResourceType {
     Taxi,
     PoliceCar
 };
+
+const vector<ResourceType> vehicleResources = {
+    ResourceType::Spacecraft,
+    ResourceType::Ambulance,
+    ResourceType::BlackViper,
+    ResourceType::Taxi,
+    ResourceType::PoliceCar
+};
+
 class ResourceManager {
 public:
     static ResourceManager& GetInstance();

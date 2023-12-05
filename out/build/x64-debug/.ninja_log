@@ -32,3 +32,10 @@
 27	2126	7235004523435627	CMakeFiles/CrossingRoad.dir/src/road.cpp.obj	535afa27512b2f9d
 20	2164	7235004523858436	CMakeFiles/CrossingRoad.dir/src/CrossingRoad.cpp.obj	4563dc85a331060f
 2164	2413	7235004525998967	CrossingRoad.exe	69b091bf1522b661
+7	1066	7235010230862065	CMakeFiles/CrossingRoad.dir/src/ResourceManager.cpp.obj	1b51c3ced381b609
+10	1765	7235010237422140	CMakeFiles/CrossingRoad.dir/src/road.cpp.obj	535afa27512b2f9d
+3	1767	7235010237432096	CMakeFiles/CrossingRoad.dir/src/CrossingRoad.cpp.obj	4563dc85a331060f
+23	969	7235011365059731	CMakeFiles/CrossingRoad.dir/src/ResourceManager.cpp.obj	1b51c3ced381b609
+28	1500	7235011370379782	CMakeFiles/CrossingRoad.dir/src/road.cpp.obj	535afa27512b2f9d
+19	1562	7235011370979819	CMakeFiles/CrossingRoad.dir/src/CrossingRoad.cpp.obj	4563dc85a331060f
+1562	1776	7235011372579814	CrossingRoad.exe	69b091bf1522b661

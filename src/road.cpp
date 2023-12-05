@@ -35,7 +35,7 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 	//The two loop below randomize the vehicle for each lane with no  overlapping vehicle
 	for (int i = 0; i < nVehicle/2; i++) {
 		int randomInt = distribution(generator);
-		ResourceType randomVehicle = static_cast<ResourceType>(randomInt % resourceManager.getSize());
+		ResourceType randomVehicle = vehicleResources[(randomInt % vehicleResources.size())];
 		vector<LTexture*> vehicleTexture = resourceManager.GetTexture(randomVehicle);
 		SDL_Rect vehicleOccupyPixels;
 		while (true) {
@@ -54,7 +54,7 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 	}
 	for (int i = 0; i < nVehicle / 2; i++) {
 		int randomInt = distribution(generator);
-		ResourceType randomVehicle = static_cast<ResourceType>(randomInt % resourceManager.getSize());
+		ResourceType randomVehicle = vehicleResources[(randomInt % vehicleResources.size())];
 		vector<LTexture*> vehicleTexture = resourceManager.GetTexture(randomVehicle);
 		SDL_Rect vehicleOccupyPixels;
 		while (true) {
