@@ -4,12 +4,11 @@
 #include <string>
 #include <unordered_map>
 enum class ResourceType {
-    Spacecraft=0,
+    Spacecraft = 0,
     Ambulance,
     BlackViper,
     Taxi,
-    PoliceCar,
-    Last //Just the last element for the purpose of randomization,not belongs to any type of resources
+    PoliceCar
 };
 class ResourceManager {
 public:
@@ -17,7 +16,7 @@ public:
 
     void LoadTexture(SDL_Renderer* gRenderer,ResourceType type, int numTexture,const string& filePath);
     vector<LTexture*> GetTexture(ResourceType type);
-
+    int getSize();
 private:
     unordered_map<ResourceType, vector<LTexture*>> textureMap;
 

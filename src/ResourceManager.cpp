@@ -15,6 +15,10 @@ ResourceManager& ResourceManager::GetInstance() {
     return instance;
 }
 
+int ResourceManager::getSize() {
+    return textureMap.size();
+}
+
 void ResourceManager::LoadTexture(SDL_Renderer* gRenderer,ResourceType type,int numTexture, const string& filePath) {
     vector<LTexture*> v;
     for (int i = 0; i < numTexture; i++) {

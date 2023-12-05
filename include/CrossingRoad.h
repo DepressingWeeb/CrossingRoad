@@ -12,4 +12,10 @@
 #include "Character.h"
 #include "ResourceManager.h"
 
+void mainScreen();
+void levelScreen();
+void settingScreen();
+void creditScreen();
+void leaderboardScreen();
+void play(int level,int mode);
 // TODO: Reference additional headers your program requires here.

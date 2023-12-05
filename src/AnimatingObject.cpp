@@ -1,41 +1,4 @@
 #include "AnimatingObject.h"
-#include "global.h"
-AnimatingObject::AnimatingObject(SDL_Renderer* renderer, vector<LTexture*> textureFrames, int numFrames, int frameDuration,int x,int y,int width,int height,int speed,double scale) {
-    this->renderer = renderer;
-    frames_ = textureFrames;
-    numFrames_ = numFrames;
-    frameDuration_ = frameDuration;
-    currentFrame_ = 0;
-    frameCounter_ = 0;
-    this->x = x;
-    this->y = y;
-    this->speed = speed;
-    this->width = static_cast<double>(width)*scale;
-    this->height = static_cast<double>(height)*scale;
-    if (width == -1) {
-        this->width = static_cast<double>(textureFrames[0]->getWidth())*scale;
-        this->height = static_cast<double>(textureFrames[0]->getHeight())*scale;
-    }
-}
-SDL_Rect AnimatingObject::boundingRect() {
-        return { x,y,width,height };//May need to edit to set hit box manually in the future
-}
-void AnimatingObject::Update() {
-    frameCounter_++;
-    if (frameCounter_ >= frameDuration_) {
-        currentFrame_ = (currentFrame_ + 1) % numFrames_;
-        frameCounter_ = 0;
-    }
-    x += speed;
-    if (speed > 0 && x > SCREEN_WIDTH)
-        x = -frames_[currentFrame_]->getWidth();
-    if (speed <= 0 && x < -width)
-        x = SCREEN_WIDTH;
-}
+AnimatingObject::~AnimatingObject() {
 
-void AnimatingObject::Draw() {
-    if(speed>0)
-        frames_[currentFrame_]->render(x, y,NULL,width,height);
-    else
-        frames_[currentFrame_]->render(x, y, NULL, width, height,SDL_FLIP_HORIZONTAL);
 }

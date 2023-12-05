@@ -167,6 +167,17 @@
 			"isCMake" : true,
 			"isExternal" : true,
 			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.26/Modules/FeatureSummary.cmake"
+		},
+		{
+			"path" : "include/vclib/sdl2mixer/cmake/sdl2_mixer-config-version.cmake"
+		},
+		{
+			"path" : "include/vclib/sdl2mixer/cmake/sdl2_mixer-config.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.26/Modules/FeatureSummary.cmake"
 		}
 	],
 	"kind" : "cmakeFiles",

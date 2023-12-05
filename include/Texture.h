@@ -1,6 +1,7 @@
 #pragma once
 #include "SDL.h"
 #include "SDL_image.h"
+#include "SDL_ttf.h"
 #include <string>
 #include <iostream>
 using namespace std;
@@ -15,6 +16,9 @@ public:
 	//Loads image at specified path
 	bool loadFromFile(string path);
 
+	//Creates image from font string
+	bool loadFromRenderedText(std::string textureText, SDL_Color textColor,TTF_Font* font);
+
 	//Deallocates texture
 	void free();
 
@@ -24,6 +28,7 @@ public:
 	//Gets image dimensions
 	int getWidth();
 	int getHeight();
+	void setColor(Uint8 red, Uint8 green, Uint8 blue);
 
 protected:
 	//The actual hardware texture

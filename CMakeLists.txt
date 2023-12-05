@@ -23,6 +23,25 @@ set(SOURCES
     src/Character.cpp
     include/ResourceManager.h
     src/ResourceManager.cpp
+    include/imgui/imconfig.h
+    include/imgui/imgui-knobs.cpp
+    include/imgui/imgui-knobs.h
+    include/imgui/imgui.cpp
+    include/imgui/imgui.h
+    include/imgui/imgui_demo.cpp
+    include/imgui/imgui_draw.cpp
+    include/imgui/imgui_impl_sdl2.cpp
+    include/imgui/imgui_impl_sdl2.h
+    include/imgui/imgui_impl_sdlrenderer.cpp
+    include/imgui/imgui_impl_sdlrenderer.h
+    include/imgui/imgui_internal.h
+    include/imgui/imgui_stdlib.cpp
+    include/imgui/imgui_stdlib.h
+    include/imgui/imgui_tables.cpp
+    include/imgui/imgui_widgets.cpp
+    include/imgui/imstb_rectpack.h
+    include/imgui/imstb_textedit.h
+    include/imgui/imstb_truetype.h
 )
 set(SDL2_DIR
     include/vclib/sdl2/cmake
@@ -33,24 +52,36 @@ set(SDL2_image_DIR
 set(SDL2_ttf_DIR
     include/vclib/sdl2ttf/cmake
 )
+
+set(SDL2_mixer_DIR 
+    include/vclib/sdl2mixer/cmake
+)
+
+set(IMGUI_DIR 
+    include/imgui
+)
+
 # Add source to this project's executab "src/ResourceManager.cpp"le.
-add_executable (CrossingRoad ${SOURCES} "include/road.h" "src/road.cpp" "include/RandomLevelGenerator.h" "src/RandomLevelGenerator.cpp")
+add_executable (CrossingRoad ${SOURCES} "include/road.h" "src/road.cpp" "include/RandomLevelGenerator.h" "src/RandomLevelGenerator.cpp" "include/Button.h" "src/Button.cpp" "include/Timer.h" "src/Timer.cpp" "include/Vehicle.h" "src/Vehicle.cpp")
 target_include_directories(CrossingRoad
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/vclib/SDL2::SDL2
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/vclib/SDL2::SDL2main
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/vclib/SDL2_image::SDL2_image
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/vclib/SDL2_ttf::SDL2_ttf
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/vclib/SDL2_mixer::SDL2_mixer
 )
 find_package(SDL2)
 find_package(SDL2_image)
 find_package(SDL2_ttf)
+find_package(SDL2_mixer)
 find_package(SDL2main)
 target_link_libraries(CrossingRoad
     PRIVATE SDL2::SDL2
     PRIVATE SDL2::SDL2main
     PRIVATE SDL2_image::SDL2_image
     PRIVATE SDL2_ttf::SDL2_ttf
+    PRIVATE SDL2_mixer::SDL2_mixer
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)

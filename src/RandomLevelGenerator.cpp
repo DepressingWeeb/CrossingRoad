@@ -5,6 +5,7 @@ RandomLevelGenerator::RandomLevelGenerator(int difficulty, int roadHeight, Chara
 	this->roadHeight = roadHeight;
 	this->player = player;
 	this->difficulty = difficulty;
+	this->level = 0;
 	generateNewLevel();
 }
 
@@ -26,19 +27,29 @@ void RandomLevelGenerator::generateNewLevel() {
 
 	// Define the distribution and generate the random number
 	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
-	int nRoad = SCREEN_HEIGHT / roadHeight;
+	int nRoad = SCREEN_HEIGHT / roadHeight; //total number of roads
+	bool isLastRoadSafe = false;
 	for (int i = 0; i < nRoad; i++) {
 		
 		int randomInt = distribution(generator);
 		int roadType = randomInt % static_cast<int>(RoadType::Last);
-		cout << roadType << endl;
+		if (isLastRoadSafe && roadType == 0) { 
+			i--;
+			continue; 
+		}
+		//cout << roadType << endl;
+		int numVehicle, newSpeed;
 		switch (roadType)
 		{
 		case 0:
 			roadVector.push_back(new SimpleSafeRoad(i * roadHeight, i * roadHeight + roadHeight));
+			isLastRoadSafe = true;
 			break;
 		case 1:
-			roadVector.push_back(new SimpleRoad(difficulty, difficulty, i * roadHeight, i * roadHeight + roadHeight));
+			numVehicle = sqrt(difficulty + 1)*2;
+			newSpeed = baseSpeed * (1.0 + 0.2 * static_cast<float>(difficulty));
+			roadVector.push_back(new SimpleRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+			isLastRoadSafe = false;
 			break;
 		default:
 			break;

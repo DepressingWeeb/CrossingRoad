@@ -1,13 +1,13 @@
 #include "Character.h"
 #include "global.h"
 
-Character::Character(SDL_Renderer* renderer, vector<vector<LTexture*>>& textureFrames, int numFrames, int frameDuration, int x, int y, int width, int height, int speed) {
+Character::Character(SDL_Renderer* renderer, const vector<vector<LTexture*>>& textureFrames, int numFrames, int frameDuration, int x, int y, int width, int height, float speed) {
 	direction = 0;
 	frames = textureFrames;
 	isDeath = false;
     isMoving = false;
-	this->x = x;
-	this->y = y;
+	this->x = static_cast<float>(x);
+	this->y = static_cast<float>(y);
     if (width == -1 && height == -1) {
         this->width = textureFrames[0][0]->getWidth();
         this->height = textureFrames[0][0]->getHeight();
@@ -16,9 +16,9 @@ Character::Character(SDL_Renderer* renderer, vector<vector<LTexture*>>& textureF
         this->width = width;
         this->height = height;
     }
-	this->speed = speed;
-    this->xChange=new int[8]{0,-speed,-speed,-speed,0,speed,speed,speed};
-    this->yChange = new int[8] {speed,speed,0,-speed,-speed,-speed,0,speed};
+	this->speed = static_cast<float>(speed);
+    this->xChange=new float[8]{0,-speed,-speed,-speed,0,speed,speed,speed};
+    this->yChange = new float[8] {speed,speed,0,-speed,-speed,-speed,0,speed};
 	this->numFrames_ = numFrames;
 	this->frameDuration_ = frameDuration;
 	this->currentFrame_ = 0;
@@ -26,7 +26,7 @@ Character::Character(SDL_Renderer* renderer, vector<vector<LTexture*>>& textureF
 	this->renderer = renderer;
 }
 void Character::checkCollision(const vector<AnimatingObject*> v) {
-    SDL_Rect characterRect = { x,y,width,height };
+    SDL_Rect characterRect = { x,y+20,width,height };
     for (auto obj : v) {
         SDL_Rect objRect = obj->boundingRect();
         if (SDL_HasIntersection(&characterRect, &objRect)) {
@@ -38,35 +38,39 @@ void Character::checkCollision(const vector<AnimatingObject*> v) {
 void Character::updateDirection() {
     int currDir = -1;
     const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-    if (currentKeyStates[SDL_SCANCODE_UP]&& currentKeyStates[SDL_SCANCODE_LEFT])
+    SDL_Scancode up = SDL_GetScancodeFromKey(globalSetting.up);
+    SDL_Scancode down = SDL_GetScancodeFromKey(globalSetting.down);
+    SDL_Scancode left = SDL_GetScancodeFromKey(globalSetting.left);
+    SDL_Scancode right = SDL_GetScancodeFromKey(globalSetting.right);
+    if (currentKeyStates[up]&& currentKeyStates[left])
     {
         currDir = 3;
     }
-    else if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_RIGHT])
+    else if (currentKeyStates[up] && currentKeyStates[right])
     {
         currDir = 5;
     }
-    else if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_LEFT])
+    else if (currentKeyStates[down] && currentKeyStates[left])
     {
         currDir = 1;
     }
-    else if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_RIGHT])
+    else if (currentKeyStates[down] && currentKeyStates[right])
     {
         currDir = 7;
     }
-    else if (currentKeyStates[SDL_SCANCODE_UP])
+    else if (currentKeyStates[up])
     {
         currDir = 4;
     }
-    else if (currentKeyStates[SDL_SCANCODE_DOWN])
+    else if (currentKeyStates[down])
     {
         currDir = 0;
     }
-    else if (currentKeyStates[SDL_SCANCODE_LEFT])
+    else if (currentKeyStates[left])
     {
         currDir = 2;
     }
-    else if (currentKeyStates[SDL_SCANCODE_RIGHT])
+    else if (currentKeyStates[right])
     {
         currDir = 6;
     }
@@ -83,15 +87,19 @@ void Character::updateCoordinate() {
     
     if (!isMoving) { 
         currentFrame_ = 0;
+        stepTimer.start();
         return; 
     }
+    
     frameCounter_++;
     if (frameCounter_ >= frameDuration_) {
         currentFrame_ = (currentFrame_ + 1) % numFrames_;
         frameCounter_ = 0;
     }
-    x += xChange[direction];
-    y += yChange[direction];
+    float timeStep = stepTimer.getTicks() / 1000.f;
+    x += xChange[direction] * timeStep;
+    y += yChange[direction] * timeStep;
+    stepTimer.start();
     
 }
 
@@ -114,7 +122,7 @@ void Character::Draw() {
 }
 
 SDL_Rect Character::getBoundingRect() {
-    return { x,y,width,height };
+    return { static_cast<int>(x),static_cast<int>(y),width,height };
 }
 
 void Character::setCoordinate(int x, int y) {
