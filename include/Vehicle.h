@@ -7,8 +7,8 @@ class NormalVehicle:public AnimatingObject {
 public:
     NormalVehicle(SDL_Renderer* renderer, vector<LTexture*> textureFrames, int numFrames, int frameDuration, int x, int y, int width, int height, int speed, double scale = 1.0);
 
-    void Update();
-    void Draw();
+    void Update() override;
+    void Draw() override;
     SDL_Rect boundingRect();
 protected:
     float x;

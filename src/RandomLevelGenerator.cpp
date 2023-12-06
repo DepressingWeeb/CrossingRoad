@@ -6,6 +6,11 @@ RandomLevelGenerator::RandomLevelGenerator(int difficulty, int roadHeight, Chara
 	this->player = player;
 	this->difficulty = difficulty;
 	this->level = 0;
+	this->lastLevelScore = 0;
+	this->currScore = 0;
+	font = TTF_OpenFont("../../../resources/Font/ARCADECLASSIC.ttf", 28);
+	this->scoreTexture = new LTexture(gRenderer);
+	scoreTexture->loadFromRenderedText(to_string(totalScore), WHITE, font);
 	generateNewLevel();
 }
 
@@ -61,19 +66,39 @@ void RandomLevelGenerator::generateNewLevel() {
 
 void RandomLevelGenerator::Update() {
 	SDL_Rect playerRect = player->getBoundingRect();
-	//if the player touch the upper bound of the screen,generate new level and reset the player's coordinate
+	//if the player touch the upper bound of the screen,generate new level and reset the player's coordinate and update scoring
 	if (playerRect.y <= 0) {
 		player->setCoordinate(SCREEN_WIDTH / 2, SCREEN_HEIGHT - playerRect.h - 10);
+		//if the last road(from bottom to top) is not safe
+		if(roadVector[0]->getRoadID() > 0)
+			currScore++;
+		//Reset score
+		lastLevelScore += currScore;
+		currScore = 0;
 		difficulty++;
 		generateNewLevel();
 	}
+	//Check for collision of player
 	for (Road* road : roadVector) {
 		road->Update();
 		player->checkCollision(road->getRoadObj());
 		
 	}
 	player->updateAll();
-	
+	//Calculate the score
+	int tempScore = 0;
+	int playerFootPosY = playerRect.y + playerRect.h;
+	int playerCurrRoad = playerFootPosY / roadHeight;//top to bottom
+	for (int i = roadVector.size() - 1; i > playerCurrRoad; i--) {
+		//if the ith road from top to bottom is not safe
+		if (roadVector[i]->getRoadID() > 0) {
+			tempScore++;
+		}
+	}
+	currScore = tempScore;
+	totalScore = lastLevelScore + currScore;
+	scoreTexture->loadFromRenderedText(to_string(totalScore), WHITE, font);
+
 }
 
 void RandomLevelGenerator::Draw() {
@@ -81,4 +106,6 @@ void RandomLevelGenerator::Draw() {
 		road->Draw();
 	}
 	player->Draw();
+	//render score
+	scoreTexture->render(SCREEN_WIDTH/2, 10, NULL, -1, -1);
 }

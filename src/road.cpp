@@ -84,7 +84,9 @@ void SimpleRoad::Draw() {
 		obj->Draw();
 	}
 }
-
+int SimpleRoad::getRoadID() {
+	return 1;
+}
 vector<AnimatingObject*> SimpleRoad::getRoadObj() {
 	return roadObj;
 }
@@ -102,6 +104,10 @@ void SimpleSafeRoad::Update() {
 
 void SimpleSafeRoad::Draw() {
 	roadTexture->render(0, startY, NULL, SCREEN_WIDTH, endY - startY);
+}
+
+int SimpleSafeRoad::getRoadID() {
+	return 0;
 }
 
 vector<AnimatingObject*> SimpleSafeRoad::getRoadObj() {

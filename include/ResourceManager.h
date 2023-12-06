@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include <string>
 #include <unordered_map>
+//Define the resources 
 enum class ResourceType {
     Spacecraft = 0,
     Ambulance,
@@ -18,13 +19,13 @@ const vector<ResourceType> vehicleResources = {
     ResourceType::Taxi,
     ResourceType::PoliceCar
 };
-
+//using Singleton pattern for ResourceManager
 class ResourceManager {
 public:
     static ResourceManager& GetInstance();
 
     void LoadTexture(SDL_Renderer* gRenderer,ResourceType type, int numTexture,const string& filePath);
-    vector<LTexture*> GetTexture(ResourceType type);
+    vector<LTexture*> GetTexture(ResourceType type);//Return a vector of LTexture represents all frames of the animation,vector of size 1 for texture with only 1 image
     int getSize();
 private:
     unordered_map<ResourceType, vector<LTexture*>> textureMap;

@@ -7,14 +7,16 @@
 #include "global.h"
 #include "Vehicle.h"
 enum class RoadType {
+	SimpleSafeRoad=0,
 	SimpleRoad,
-	SimpleSafeRoad,
+	
 	Last //Last element for the purpose of randomization
 };
 class Road {
 public:
 	virtual void Update() = 0;
 	virtual void Draw() = 0;
+	virtual int getRoadID() = 0;//Get the id from enum
 	virtual vector<AnimatingObject*> getRoadObj() = 0;
 	virtual ~Road()=0;
 };
@@ -32,6 +34,7 @@ public:
 	SimpleRoad( int nVehicle, int speed,int startY,int endY);
 	void Update() override;
 	void Draw() override;
+	int getRoadID() override;
 	vector<AnimatingObject*> getRoadObj() override;
 };
 
@@ -44,8 +47,10 @@ public:
 	SimpleSafeRoad(int startY, int endY);
 	void Update() override;
 	void Draw() override;
+	int getRoadID() override;
 	vector<AnimatingObject*> getRoadObj() override;
 };
 
 class RoadWithTrafficLight:public Road{};//TODO
+
 class Railway:public Road{};//TODO
