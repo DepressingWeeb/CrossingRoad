@@ -25,6 +25,11 @@ void ResourceManager::LoadTexture(SDL_Renderer* gRenderer,ResourceType type,int 
         string path = filePath + (i < 10 ? "tile00" + to_string(i) + ".png" : "tile0" + to_string(i) + ".png");
         v.push_back(new LTexture(gRenderer, path));
     }
+    if (textureMap.find(type) != textureMap.end()) {
+        for (LTexture* texture : textureMap[type]) {
+            delete texture;
+        }
+    }
     textureMap[type] = v;
 }
 

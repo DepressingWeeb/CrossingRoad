@@ -6,7 +6,7 @@
 class Character {
 private:
 	int direction;
-	vector<vector<LTexture*>> frames;
+	vector<vector<LTexture*>> frames;//should not be deleted when destructor calls
 	bool isDeath;
 	bool isMoving;
 	float x;
@@ -14,6 +14,7 @@ private:
 	int width;
 	int height;
 	float speed;
+	float levelSpeed;//in endless mode,the level moving speed
 	float* xChange;
 	float* yChange;
 	LTimer stepTimer;
@@ -21,15 +22,18 @@ private:
 	int frameDuration_;
 	int currentFrame_;
 	int frameCounter_;
-	SDL_Renderer* renderer;
+	SDL_Renderer* renderer;//Also should not be deleted
 public:
-	Character(SDL_Renderer* renderer,const vector<vector<LTexture*>>& textureFrames, int numFrames, int frameDuration, int x, int y, int width=-1, int height=-1, float speed=50);
-	void checkCollision(const vector<AnimatingObject*> v);
+	Character(SDL_Renderer* renderer,const vector<LTexture*>& textureFrames, int numFrames, int frameDuration, int x, int y, int width=-1, int height=-1, float speed=50,float levelSpeed=0);
+	~Character();
+	bool checkDangerousCollision(const vector<SDL_Rect>& dangerousObjBoundRectVector);
 	void updateDirection();
-	void updateCoordinate();
+	void updateAnimation();
+	void updateCoordinate(const vector<SDL_Rect>& safeObjBoundRectVector);
 	void updateIfDeath();
-	void updateAll();
+	//void updateAll();
 	void Draw();
 	SDL_Rect getBoundingRect();
 	void setCoordinate(int x, int y);
+	void setLevelSpeed(float newSpeed);
 };

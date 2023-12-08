@@ -3,13 +3,17 @@
 #include "Texture.h"
 #include <string>
 #include <unordered_map>
-//Define the resources 
+//Define the resources for all animating objects
 enum class ResourceType {
     Spacecraft = 0,
     Ambulance,
     BlackViper,
     Taxi,
-    PoliceCar
+    PoliceCar,
+    Explosion,
+    Character,
+    SimpleRoad,
+    SimpleSafeRoad
 };
 
 const vector<ResourceType> vehicleResources = {

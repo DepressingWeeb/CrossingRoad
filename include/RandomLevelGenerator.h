@@ -15,12 +15,15 @@ private:
 	int lastLevelScore;//total score till the last level
 	LTexture* scoreTexture;//for render score to screen
 	int totalScore;//totalScore=lastLevelScore+currScore
-	const float baseSpeed = 50.f; //base speed: pixel/s of vehicle when difficulty is 0, actual speed=baseSpeed*(1+0.2*diff)
+	float baseSpeed;//base speed: pixel/s of vehicle when difficulty is 0, actual speed=baseSpeed*(1+0.2*diff)
 	//number of vehicle each road = sqrt(diff+1)*2
-public:
-	RandomLevelGenerator(int difficulty,int roadHeight,Character* player);
+	std::mt19937_64 generator;//random engine
+	std::uniform_int_distribution<int> distribution;
 	void generateNewLevel();
-	void Update();
+public:
+	RandomLevelGenerator(int difficulty,int roadHeight,Character* player,float baseSpeed=50.f);
+	~RandomLevelGenerator();
+	bool Update(); //return true if update performed,0 if the character is dead
 	void Draw();
 	void ToFile();
 	void FromFile();

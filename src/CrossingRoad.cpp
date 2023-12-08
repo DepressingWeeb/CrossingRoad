@@ -4,6 +4,7 @@
 #include "CrossingRoad.h"
 #include "road.h"
 #include "RandomLevelGenerator.h"
+#include "EndlessLevelGenerator.h"
 #include "Button.h"
 //#include <SDL_mixer.h>
 #include "imgui/imgui.h"
@@ -46,13 +47,20 @@ void init() {
 	
 }
 
-void loadResourceVehicle() {
+void loadResourceCity() {
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
+	resourceManager.LoadTexture(gRenderer, ResourceType::Character, 32, "../../../resources/character/");
+
 	resourceManager.LoadTexture(gRenderer, ResourceType::Spacecraft, 3, "../../../resources/vehicle/spacecraft/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Taxi, 1, "../../../resources/vehicle/taxi/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::BlackViper, 1, "../../../resources/vehicle/blackviper/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Ambulance, 3, "../../../resources/vehicle/ambulance/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::PoliceCar, 3, "../../../resources/vehicle/police/");
+
+	resourceManager.LoadTexture(gRenderer, ResourceType::Explosion, 12, "../../../resources/Collision/VehicleCollision/");
+
+	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleRoad, 3, "../../../resources/Road/SimpleRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleSafeRoad, 1, "../../../resources/Road/SimpleSafeRoad/");
 }
 
 void highlightRect(SDL_Rect rectHighlight) {
@@ -66,43 +74,99 @@ void highlightRect(SDL_Rect rectHighlight) {
 //args[0]: level(terrain) type (0:city , 1:forest)
 //args[1]: mode (0: level mode, 1: endless mode)
 void game(const vector<int>& args) {
-	cout << "test" << endl;
 	SDL_Event e;
 	SDL_Rect rect;
-	//Load the character movement resources
-	vector<vector<LTexture*>> framesCharacter(8, vector<LTexture*>(4, nullptr));
-	for (int i = 0; i < 32; i++) {
-		string path = "../../../resources/character/" + (i < 10 ? "tile00" + to_string(i) + ".png" : "tile0" + to_string(i) + ".png");
-		framesCharacter[i / 4][i % 4] = new LTexture(gRenderer, path);
-	}
-	//load the vehicle resource
-	loadResourceVehicle();
-	
-	Character player(gRenderer, framesCharacter, 4, 10, 300, 610, 32, 32, 200);
-	RandomLevelGenerator levelGenerator(0, 100, &player);
-	bool quit = false;
-	while (!quit) {
-		SDL_RenderClear(gRenderer);
-		SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-		SDL_RenderFillRect(gRenderer, &SCREEN);
-		ImGui_ImplSDLRenderer_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
-		levelGenerator.Update();
-		levelGenerator.Draw();
-		if (SDL_PollEvent(&e)) {
-			ImGui_ImplSDL2_ProcessEvent(&e);
-			switch (e.type) {
-			case SDL_QUIT:
-				quit = true;
-				quitGame();
-				break;
+	ResourceManager& resourceManager = ResourceManager::GetInstance();
+	//load the resource
+	loadResourceCity();
+	//load collision effect
+	bool isPlaying = true;
+	vector<LTexture*> collisionFrames = resourceManager.GetTexture(ResourceType::Explosion);
+	AnimatingObject* collisionEffect=nullptr;
+	int currCollisionFrame = 0;
+	Character player(gRenderer, resourceManager.GetTexture(ResourceType::Character), 4, 10, 300, 610, 32, 32, 200);
+	if (args[1] == 0) {
+		RandomLevelGenerator levelGenerator(0, 100, &player);
+		bool quit = false;
+		while (!quit) {
+			SDL_RenderClear(gRenderer);
+			SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+			SDL_RenderFillRect(gRenderer, &SCREEN);
+			ImGui_ImplSDLRenderer_NewFrame();
+			ImGui_ImplSDL2_NewFrame();
+			ImGui::NewFrame();
+			if(isPlaying)
+				isPlaying&=levelGenerator.Update();
+			levelGenerator.Draw();
+			//if the player lose, then generate collision
+			if (!isPlaying) {
+				if (!collisionEffect) {
+					SDL_Rect characterRect = player.getBoundingRect();
+					collisionEffect = new NormalVehicle(gRenderer, collisionFrames, 12, 5, characterRect.x-25, characterRect.y-25, -1, -1, 0);
+				}
+				else if (currCollisionFrame >= 60) {
+					quit = true;
+					functionStack.push(VoidFunction(levelScreen));
+				}
+				collisionEffect->Update();
+				collisionEffect->Draw();
+				currCollisionFrame++;
 			}
+			if (SDL_PollEvent(&e)) {
+				ImGui_ImplSDL2_ProcessEvent(&e);
+				switch (e.type) {
+				case SDL_QUIT:
+					quit = true;
+					quitGame();
+					break;
+				}
+			}
+			ImGui::Render();
+			ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+			SDL_RenderPresent(gRenderer);
 		}
-		ImGui::Render();
-		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-		SDL_RenderPresent(gRenderer);
 	}
+	else {
+		EndlessLevelGenerator levelGenerator(0, 100, &player);
+		bool quit = false;
+		while (!quit) {
+			SDL_RenderClear(gRenderer);
+			SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+			SDL_RenderFillRect(gRenderer, &SCREEN);
+			ImGui_ImplSDLRenderer_NewFrame();
+			ImGui_ImplSDL2_NewFrame();
+			ImGui::NewFrame();
+			if (isPlaying)
+				isPlaying &= levelGenerator.Update();
+			levelGenerator.Draw();
+			if (!isPlaying) {
+				if (!collisionEffect) {
+					SDL_Rect characterRect = player.getBoundingRect();
+					collisionEffect = new NormalVehicle(gRenderer, collisionFrames, 12, 5, characterRect.x-25, characterRect.y-25, -1, -1, 0);
+				}
+				else if (currCollisionFrame >= 60) {
+					quit = true;
+					functionStack.push(VoidFunction(levelScreen));
+				}
+				collisionEffect->Update();
+				collisionEffect->Draw();
+				currCollisionFrame++;
+			}
+			if (SDL_PollEvent(&e)) {
+				ImGui_ImplSDL2_ProcessEvent(&e);
+				switch (e.type) {
+				case SDL_QUIT:
+					quit = true;
+					quitGame();
+					break;
+				}
+			}
+			ImGui::Render();
+			ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+			SDL_RenderPresent(gRenderer);
+		}
+	}
+	delete collisionEffect;
 
 }
 void leaderboardScreen() {
@@ -655,7 +719,6 @@ void levelScreen() {
 	delete levelMode;
 	delete endlessMode;
 	delete playButton;
-
 }
 
 

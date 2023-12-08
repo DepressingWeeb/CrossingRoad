@@ -21,18 +21,22 @@ SDL_Rect NormalVehicle::boundingRect() {
     return { static_cast<int>(x) + 10,static_cast<int>(y) + 10,width - 10,height - 10 };//May need to edit to set hit box manually in the future
 }
 void NormalVehicle::Update() {
+    //update animation frames
     frameCounter_++;
     if (frameCounter_ >= frameDuration_) {
         currentFrame_ = (currentFrame_ + 1) % numFrames_;
         frameCounter_ = 0;
     }
-    float timeStep = stepTimer.getTicks() / 1000.f;
+    //update coordinate of vehicle
+    float timeStep = stepTimer.getTicks() / 1000.f;//the delta time from last frame to current frame in seconds
     x += speed * timeStep;
+    //if the vehicle is moving to the right and it passed the right boundary, then reset it to the left
     if (speed > 0 && x > SCREEN_WIDTH)
         x = -frames_[currentFrame_]->getWidth();
+    //if the vehicle is moving to the left and it passed the left boundary, then reset it to the right
     if (speed <= 0 && x < -width)
         x = SCREEN_WIDTH;
-    stepTimer.start();
+    stepTimer.start();//reset the timer
 }
 
 void NormalVehicle::Draw() {
@@ -40,4 +44,12 @@ void NormalVehicle::Draw() {
         frames_[currentFrame_]->render(x, y, NULL, width, height);
     else
         frames_[currentFrame_]->render(x, y, NULL, width, height, SDL_FLIP_HORIZONTAL);
+}
+
+void NormalVehicle::setYCoordinate(float y) {
+    this->y = y;
+}
+
+int NormalVehicle::getYCoordinate() {
+    return y;
 }

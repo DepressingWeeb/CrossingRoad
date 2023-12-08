@@ -1,22 +1,26 @@
 #include "Character.h"
 #include "global.h"
 
-Character::Character(SDL_Renderer* renderer, const vector<vector<LTexture*>>& textureFrames, int numFrames, int frameDuration, int x, int y, int width, int height, float speed) {
+Character::Character(SDL_Renderer* renderer, const vector<LTexture*>& textureFrames, int numFrames, int frameDuration, int x, int y, int width, int height, float speed,float levelSpeed) {
 	direction = 0;
-	frames = textureFrames;
+    frames = vector<vector<LTexture*>>(8, vector<LTexture*>(4));
+    for (int i = 0; i < textureFrames.size(); i++) {
+        frames[i / 4][i % 4] = textureFrames[i];
+    }
 	isDeath = false;
     isMoving = false;
 	this->x = static_cast<float>(x);
 	this->y = static_cast<float>(y);
     if (width == -1 && height == -1) {
-        this->width = textureFrames[0][0]->getWidth();
-        this->height = textureFrames[0][0]->getHeight();
+        this->width = frames[0][0]->getWidth();
+        this->height = frames[0][0]->getHeight();
     }
     else {
         this->width = width;
         this->height = height;
     }
-	this->speed = static_cast<float>(speed);
+	this->speed = speed;
+    this->levelSpeed = levelSpeed;
     this->xChange=new float[8]{0,-speed,-speed,-speed,0,speed,speed,speed};
     this->yChange = new float[8] {speed,speed,0,-speed,-speed,-speed,0,speed};
 	this->numFrames_ = numFrames;
@@ -25,15 +29,21 @@ Character::Character(SDL_Renderer* renderer, const vector<vector<LTexture*>>& te
 	this->frameCounter_ = 0;
 	this->renderer = renderer;
 }
-void Character::checkCollision(const vector<AnimatingObject*> v) {
-    SDL_Rect characterRect = { x,y+20,width,height };
-    for (auto obj : v) {
-        SDL_Rect objRect = obj->boundingRect();
+
+Character::~Character() {
+    delete[] xChange;
+    delete[] yChange;
+}
+
+bool Character::checkDangerousCollision(const vector<SDL_Rect>& dangerousObjBoundRectVector) {
+    SDL_Rect characterRect = { x,y+20,width,height-20 };
+    for (SDL_Rect objRect : dangerousObjBoundRectVector) {
         if (SDL_HasIntersection(&characterRect, &objRect)) {
             isDeath = true;
-            break;
+            return true;
         }
     }
+    return false;
 }
 void Character::updateDirection() {
     int currDir = -1;
@@ -83,39 +93,49 @@ void Character::updateDirection() {
     }
 }
 
-void Character::updateCoordinate() {
-    
-    if (!isMoving) { 
+void Character::updateAnimation() {
+    if (!isMoving) {
         currentFrame_ = 0;
-        stepTimer.start();
-        return; 
+        return;
     }
-    
+    //update animation
     frameCounter_++;
     if (frameCounter_ >= frameDuration_) {
         currentFrame_ = (currentFrame_ + 1) % numFrames_;
         frameCounter_ = 0;
     }
-    float timeStep = stepTimer.getTicks() / 1000.f;
+}
+
+void Character::updateCoordinate(const vector<SDL_Rect>& safeObjBoundRectVector) {
+    float timeStep = stepTimer.getTicks() / 1000.f;//Get the time from last frame to current frame
+    y += levelSpeed * timeStep;//Always minus the levelspeed
+    stepTimer.start();//reset timer
+    if (!isMoving) 
+        return;
+    //update coordinate
     x += xChange[direction] * timeStep;
     y += yChange[direction] * timeStep;
-    stepTimer.start();
     
+    //If the updated coordinate intersect with any of the safeObj (Obstacles),undo the change
+    bool isIntersectSafeObj = false;
+    SDL_Rect characterRect = { x,y + 20,width,height };
+    for (SDL_Rect objRect : safeObjBoundRectVector) {
+        if (SDL_HasIntersection(&characterRect, &objRect)) {
+            isIntersectSafeObj = true;
+            break;
+        }
+    }
+    if (isIntersectSafeObj) {
+        x -= xChange[direction] * timeStep;
+        y -= yChange[direction] * timeStep;
+    }
 }
 
 void Character::updateIfDeath() {
     if (isDeath) {
-        isDeath = false;
-        x = SCREEN_WIDTH/2;
-        y = SCREEN_HEIGHT-height-10;
         //TODO:
         //Need to update death event in the future
     }
-}
-void Character::updateAll() {
-    updateIfDeath();
-    updateDirection();//check for keyboard event and update direction accordingly
-    updateCoordinate();//change the frame and update coordinate of character
 }
 void Character::Draw() {
     frames[direction][currentFrame_]->render(x, y, NULL, width, height);
@@ -128,4 +148,8 @@ SDL_Rect Character::getBoundingRect() {
 void Character::setCoordinate(int x, int y) {
     this->x = x;
     this->y = y;
+}
+
+void Character::setLevelSpeed(float newSpeed) {
+    this->levelSpeed = newSpeed;
 }
