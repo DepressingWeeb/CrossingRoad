@@ -41,6 +41,7 @@ void RandomLevelGenerator::generateNewLevel() {
 		}
 		//cout << roadType << endl;
 		int numVehicle, newSpeed;
+		float timeRedLight, timeGreenLight;
 		switch (roadType)
 		{
 		case 0:
@@ -53,6 +54,11 @@ void RandomLevelGenerator::generateNewLevel() {
 			roadVector.push_back(new SimpleRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
 			isLastRoadSafe = false;
 			break;
+		case 2:
+			newSpeed = baseSpeed * 24 + (baseSpeed * difficulty*2);
+			timeRedLight = 4.f - 0.1f * static_cast<float>(difficulty);
+			timeGreenLight = 2.f + 0.1f * static_cast<float>(difficulty);
+			roadVector.push_back(new Railway(1200, 4, 4, i * roadHeight, i * roadHeight + roadHeight));
 		default:
 			break;
 		}

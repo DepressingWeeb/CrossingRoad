@@ -27,6 +27,27 @@ protected:
     SDL_Renderer* renderer;
 };
 
-class VehicleWithTrafficLight:public NormalVehicle{};//TODO
-
-class Train:public VehicleWithTrafficLight{};//TODO
+class Train:public AnimatingObject{
+public:
+    Train(SDL_Renderer* renderer,float y,int height, float speed, double scale = 1.0);
+    void Update() override;
+    void Draw() override;
+    int getYCoordinate() override;
+    void setYCoordinate(float y) override;
+    void setRedLight(bool redLight);
+    SDL_Rect boundingRect();
+protected:
+    enum class TrainTextureType {
+        TRAIN_HEAD,
+        TRAIN_PART
+    };
+    float y;
+    int height;
+    float speed;//pixel/s
+    bool isRedLight;
+    vector<pair<SDL_Rect,TrainTextureType>> trainCurrCoord;
+    LTimer stepTimer;
+    LTexture* trainHeadTexture;
+    LTexture* trainPartTexture;
+    SDL_Renderer* renderer;
+};//TODO

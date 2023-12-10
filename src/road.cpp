@@ -134,7 +134,10 @@ void SimpleSafeRoad::Update() {
 }
 
 void SimpleSafeRoad::Draw() {
-	roadTexture->render(0, startY, NULL, SCREEN_WIDTH, endY - startY);
+	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
+	for (int i = 0; i < nRoadRender; i++) {
+		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
 }
 
 int SimpleSafeRoad::getRoadID() {
@@ -152,4 +155,84 @@ vector<SDL_Rect> SimpleSafeRoad::getDangerousRoadObjBoundRect() {
 
 vector<SDL_Rect> SimpleSafeRoad::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
+}
+
+Railway::Railway(int speed, float timeTrafficLightRed, float timeTrafficLightGreen, int startY, int endY) {
+	this->speed = speed;
+	this->timeTrafficLightGreen = timeTrafficLightGreen;
+	this->timeTrafficLightRed = timeTrafficLightRed;
+	ResourceManager& resourceManager = ResourceManager::GetInstance();
+	this->roadTexture = resourceManager.GetTexture(ResourceType::Railway)[0];
+	this->trafficLightRed = resourceManager.GetTexture(ResourceType::TrafficLight)[0];
+	this->trafficLightGreen = resourceManager.GetTexture(ResourceType::TrafficLight)[1];
+	this->startY = startY;
+	this->endY = endY;
+	this->train = new Train(gRenderer,startY,endY-startY, speed);
+	this->isRedLight = true;
+	train->setRedLight(isRedLight);
+	// Get the current time in nanoseconds
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
+
+	// Seed the random number generator with nanoseconds
+	std::mt19937_64 generator(nanoseconds);
+
+	// Define the range for the random number
+	int minNumber = 0;
+	int maxNumber = INT_MAX;
+
+	// Define the distribution and generate the random number
+	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
+	this->timeSinceLastLightChange = (static_cast<float>(distribution(generator))/static_cast<float>(maxNumber))*4.f;
+}
+int Railway::getRoadID() {
+	return 2;
+}
+
+vector<SDL_Rect> Railway::getDangerousRoadObjBoundRect() {
+	vector<SDL_Rect> ans;
+	ans.push_back(train->boundingRect());
+	return ans;
+}
+
+vector<SDL_Rect> Railway::getSafeRoadObjBoundRect() {
+	vector<SDL_Rect> ans;
+	ans.push_back({ 10, endY - trafficLightRed->getHeight(), trafficLightRed->getWidth(), trafficLightRed->getHeight() });
+	return ans;
+}
+
+void Railway::setStartEndPosRoad(int newStartY, int newEndY) {
+	this->startY = newStartY;
+	this->endY = newEndY;
+	train->setYCoordinate(startY);
+}
+
+void Railway::Update() {
+	float timeStep = stepTimer.getTicks() / 1000.f;
+	stepTimer.start();
+	timeSinceLastLightChange += timeStep;
+	if (isRedLight && timeSinceLastLightChange>timeTrafficLightRed) {
+		timeSinceLastLightChange =0;
+		isRedLight = false;
+		train->setRedLight(isRedLight);
+	}
+	else if(!isRedLight && timeSinceLastLightChange > timeTrafficLightGreen) {
+		timeSinceLastLightChange =0;
+		isRedLight = true;
+		train->setRedLight(isRedLight);
+	}
+	train->Update();
+}
+
+void Railway::Draw() {
+	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
+	for (int i = 0; i < nRoadRender; i++) {
+		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
+	train->Draw();
+	if (isRedLight)
+		trafficLightRed->render(10, endY-trafficLightRed->getHeight(), NULL, trafficLightRed->getWidth(), trafficLightRed->getHeight());
+	else
+		trafficLightGreen->render(10, endY-trafficLightGreen->getHeight(), NULL, trafficLightGreen->getWidth(), trafficLightGreen->getHeight());
+
 }

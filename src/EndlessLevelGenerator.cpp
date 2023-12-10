@@ -36,6 +36,7 @@ void EndlessLevelGenerator::generateFirstLevel() {
 		}
 		//cout << roadType << endl;
 		int numVehicle, newSpeed;
+		float timeRedLight, timeGreenLight;
 		switch (roadType)
 		{
 		case 0:
@@ -47,6 +48,14 @@ void EndlessLevelGenerator::generateFirstLevel() {
 			numVehicle = sqrt(difficulty + 1) * 2;
 			newSpeed = baseSpeed * (1.0);
 			roadVector.push_back(new SimpleRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+			roadPosVector.push_back(make_pair(i * roadHeight, i * roadHeight + roadHeight));
+			isLastRoadSafe = false;
+			break;
+		case 2:
+			newSpeed = baseSpeed * 24 + (baseSpeed * difficulty) / 4;
+			timeRedLight = 4.f - 0.015f * static_cast<float>(difficulty);
+			timeGreenLight = 2.f + 0.015f * static_cast<float>(difficulty);
+			roadVector.push_back(new Railway(newSpeed, timeRedLight, timeGreenLight, i * roadHeight, i * roadHeight + roadHeight));
 			roadPosVector.push_back(make_pair(i * roadHeight, i * roadHeight + roadHeight));
 			isLastRoadSafe = false;
 			break;
@@ -72,6 +81,7 @@ void EndlessLevelGenerator::generateNewRoad() {
 		}
 		//cout << roadType << endl;
 		int numVehicle, newSpeed;
+		float timeRedLight, timeGreenLight;
 		switch (roadType)
 		{
 		case 0:
@@ -83,6 +93,14 @@ void EndlessLevelGenerator::generateNewRoad() {
 			numVehicle = sqrt((difficulty / (SCREEN_WIDTH / roadHeight)) + 1) * 2;
 			newSpeed = baseSpeed * (1.0 + 0.04 * static_cast<float>(difficulty));
 			roadVector.insert(roadVector.begin(),new SimpleRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+			isLastRoadSafe = false;
+			break;
+		case 2:
+			newSpeed = baseSpeed * 24 + (baseSpeed * difficulty)/4;
+			timeRedLight = 4.f - 0.04f * static_cast<float>(difficulty);
+			timeGreenLight= 2.f + 0.04f * static_cast<float>(difficulty);
+			roadVector.insert(roadVector.begin(), new Railway(newSpeed,timeRedLight, timeGreenLight, i * roadHeight, i * roadHeight + roadHeight));
 			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
 			isLastRoadSafe = false;
 			break;
@@ -111,6 +129,7 @@ bool EndlessLevelGenerator::Update() {
 	topRoadPos = roadPosVector[0];
 	float topRoadStartY = topRoadPos.first - levelUpperPosY;
 	float topRoadEndY = topRoadStartY + roadHeight;
+	cout << topRoadStartY << endl;
 	bool isCollided = false;
 	vector<SDL_Rect> safeObjBoundRectVector;
 	for (Road* road : roadVector) {
@@ -134,6 +153,7 @@ bool EndlessLevelGenerator::Update() {
 }
 
 void EndlessLevelGenerator::Draw() {
+	
 	for (Road* road : roadVector) {
 		road->Draw();
 	}

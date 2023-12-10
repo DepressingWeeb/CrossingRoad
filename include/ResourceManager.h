@@ -10,10 +10,13 @@ enum class ResourceType {
     BlackViper,
     Taxi,
     PoliceCar,
+    Train,
     Explosion,
+    TrafficLight,
     Character,
     SimpleRoad,
-    SimpleSafeRoad
+    SimpleSafeRoad,
+    Railway
 };
 
 const vector<ResourceType> vehicleResources = {

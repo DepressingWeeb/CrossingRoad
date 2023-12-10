@@ -9,7 +9,7 @@
 enum class RoadType {
 	SimpleSafeRoad=0,
 	SimpleRoad,
-	
+	Railway,
 	Last //Last element for the purpose of randomization
 };
 class Road {
@@ -60,6 +60,28 @@ public:
 
 class RoadWithTrafficLight:public Road{};//TODOCITY
 
-class Railway:public Road{};//TODOCITY
+class Railway:public Road{
+	LTexture* roadTexture;
+	LTexture* trafficLightRed;
+	LTexture* trafficLightGreen;
+	LTimer stepTimer;
+	Train* train;
+	int speed;
+	bool isRedLight;
+	float timeTrafficLightRed;
+	float timeTrafficLightGreen;
+	float timeSinceLastLightChange;
+	int startY;
+	int endY;
+public:
+	Railway(int speed,float timeTrafficLightRed,float timeTrafficLightGreen,int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+	
+};//TODOCITY
 
 //TODOFOREST: create new road type for forest terrain, have to inherit from class Road

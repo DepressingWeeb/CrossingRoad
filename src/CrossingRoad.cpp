@@ -57,10 +57,14 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::Ambulance, 3, "../../../resources/vehicle/ambulance/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::PoliceCar, 3, "../../../resources/vehicle/police/");
 
+	resourceManager.LoadTexture(gRenderer, ResourceType::Train, 2, "../../../resources/vehicle/train/");
+
 	resourceManager.LoadTexture(gRenderer, ResourceType::Explosion, 12, "../../../resources/Collision/VehicleCollision/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::TrafficLight, 2, "../../../resources/Road/Railway/TrafficLight/");
 
 	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleRoad, 3, "../../../resources/Road/SimpleRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleSafeRoad, 1, "../../../resources/Road/SimpleSafeRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Railway, 1, "../../../resources/Road/Railway/Rail/");
 }
 
 void highlightRect(SDL_Rect rectHighlight) {
