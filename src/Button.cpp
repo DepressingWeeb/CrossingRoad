@@ -15,8 +15,6 @@ Button::~Button() {
 	funcIfClicked = nullptr;
 }
 void Button::Update(bool* quit) {
-	int mouseX, mouseY;
-	SDL_Rect buttonRect;
 	SDL_Point mousePos;
 	bool clicked = SDL_GetMouseState(&mousePos.x, &mousePos.y) & SDL_BUTTON_LMASK;
 	SDL_Rect collisionRect;
