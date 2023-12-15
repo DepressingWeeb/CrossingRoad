@@ -90,7 +90,7 @@ void SimpleRoad::Draw() {
 }
 int SimpleRoad::getRoadID() {
 	//the id in enum class
-	return 1;
+	return static_cast<int>(RoadType::SimpleRoad);
 }
 
 void SimpleRoad::setStartEndPosRoad(int newStartY, int newEndY) {
@@ -141,7 +141,7 @@ void SimpleSafeRoad::Draw() {
 }
 
 int SimpleSafeRoad::getRoadID() {
-	return 0;
+	return static_cast<int>(RoadType::SimpleSafeRoad);
 }
 
 void SimpleSafeRoad::setStartEndPosRoad(int newStartY, int newEndY) {
@@ -186,7 +186,7 @@ Railway::Railway(int speed, float timeTrafficLightRed, float timeTrafficLightGre
 	this->timeSinceLastLightChange = (static_cast<float>(distribution(generator))/static_cast<float>(maxNumber))*4.f;
 }
 int Railway::getRoadID() {
-	return 2;
+	return static_cast<int>(RoadType::Railway);
 }
 
 vector<SDL_Rect> Railway::getDangerousRoadObjBoundRect() {
@@ -235,4 +235,76 @@ void Railway::Draw() {
 	else
 		trafficLightGreen->render(10, endY-trafficLightGreen->getHeight(), NULL, trafficLightGreen->getWidth(), trafficLightGreen->getHeight());
 
+}
+
+
+River::River(int startY, int endY) {
+	ResourceManager& resourceManager = ResourceManager::GetInstance();
+	this->bg = resourceManager.GetTexture(ResourceType::SimpleSafeRoad)[0];
+	this->bridge = resourceManager.GetTexture(ResourceType::Bridge)[0];
+	this->startY = startY;
+	this->endY = endY;
+	// Get the current time in nanoseconds
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
+
+	// Seed the random number generator with nanoseconds
+	std::mt19937_64 generator(nanoseconds);
+
+	// Define the range for the random number
+	int minNumber = 0;
+	int maxNumber = INT_MAX;
+
+	// Define the distribution and generate the random number
+	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
+	this->bridgeW = (endY - startY) * bridgeWidthHeightRatio;
+	this->bridgeX = distribution(generator) % (SCREEN_WIDTH-bridgeW);
+	int tileHeight = (endY - startY) / 2;
+	int tileWidth = tileHeight;
+	int nPairTile = ceil(SCREEN_WIDTH / static_cast<float>(tileWidth));
+	for (int i = 0; i < nPairTile; i++) {
+		StaticAnimatingObject* upperWaterTile = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(ResourceType::UpperWaterLane), 14, 4, i * tileWidth, startY, tileWidth, tileHeight);
+		StaticAnimatingObject* lowerWaterTile = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(ResourceType::LowerWaterLane), 14, 4, i * tileWidth, startY+tileHeight, tileWidth, tileHeight);
+		this->waters.push_back(make_pair(upperWaterTile, lowerWaterTile));
+	}
+}
+
+void River::Update() {
+	for (int i = 0; i < waters.size(); i++) {
+		waters[i].first->Update();
+		waters[i].second->Update();
+	}
+}
+
+vector<SDL_Rect> River::getSafeRoadObjBoundRect() {
+	return vector<SDL_Rect>();
+}
+
+vector<SDL_Rect> River::getDangerousRoadObjBoundRect() {
+	SDL_Rect rect1 = { 0,startY,bridgeX,endY - startY };
+	SDL_Rect rect2 = { bridgeX + bridgeW,startY,SCREEN_WIDTH,endY - startY };
+	vector<SDL_Rect> ans = { rect1,rect2 };
+	return ans;
+}
+
+void River::Draw() {
+	bg->render(0, startY, NULL,SCREEN_WIDTH, endY - startY);
+	for (auto p : waters) {
+		p.first->Draw();
+		p.second->Draw();
+	}
+	bridge->render(bridgeX, startY, NULL, bridgeW, endY - startY);
+}
+
+void River::setStartEndPosRoad(int newStartY, int newEndY) {
+	this->startY = newStartY;
+	this->endY = newEndY;
+	for (auto p : waters) {
+		p.first->setYCoordinate(newStartY);
+		p.second->setYCoordinate(newStartY+ (endY - startY) / 2);
+	}
+}
+
+int River::getRoadID() {
+	return static_cast<int>(RoadType::River);
 }

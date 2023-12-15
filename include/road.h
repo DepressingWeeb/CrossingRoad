@@ -6,10 +6,12 @@
 #include "Texture.h"
 #include "global.h"
 #include "Vehicle.h"
+#include "StaticAnimatingObject.h"
 enum class RoadType {
 	SimpleSafeRoad=0,
 	SimpleRoad,
 	Railway,
+	River,
 	Last //Last element for the purpose of randomization
 };
 class Road {
@@ -58,7 +60,25 @@ public:
 	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
 };
 
-class RoadWithTrafficLight:public Road{};//TODOCITY
+class River:public Road{
+private:
+	LTexture* bg;
+	LTexture* bridge;
+	int startY;
+	int endY;
+	int bridgeX;
+	int bridgeW;
+	const float bridgeWidthHeightRatio = 0.81f;
+	vector<pair<StaticAnimatingObject*,StaticAnimatingObject*>> waters; //pair.first is texture for upper water lane, pair.second is for lower water lane
+public:
+	River( int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};//TODOCITY
 
 class Railway:public Road{
 	LTexture* roadTexture;
@@ -82,6 +102,6 @@ public:
 	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
 	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
 	
-};//TODOCITY
+};
 
 //TODOFOREST: create new road type for forest terrain, have to inherit from class Road

@@ -25,6 +25,7 @@ private:
 public:
 	EndlessLevelGenerator(int difficulty, int roadHeight, Character* player,float baseSpeed=50.f,float levelSpeed=20.f);
 	~EndlessLevelGenerator();
+	int getScore();
 	bool Update();
 	void Draw();
 	void ToFile();

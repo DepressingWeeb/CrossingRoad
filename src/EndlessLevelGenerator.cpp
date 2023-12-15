@@ -7,6 +7,7 @@ EndlessLevelGenerator::EndlessLevelGenerator(int difficulty, int roadHeight, Cha
 	this->baseSpeed = baseSpeed;
 	this->levelSpeed = levelSpeed;
 	this->levelUpperPosY = 0;
+	this->totalScore = 0;
 	this->player->setLevelSpeed(levelSpeed);
 	font = TTF_OpenFont("../../../resources/Font/ARCADECLASSIC.ttf", 28);
 	this->scoreTexture = new LTexture(gRenderer);
@@ -111,6 +112,10 @@ void EndlessLevelGenerator::generateNewRoad() {
 
 }
 
+int EndlessLevelGenerator::getScore() {
+	return totalScore;
+}
+
 bool EndlessLevelGenerator::Update() {
 	float timeStep = stepTimer.getTicks() / 1000.f;
 	stepTimer.start();
@@ -129,7 +134,7 @@ bool EndlessLevelGenerator::Update() {
 	topRoadPos = roadPosVector[0];
 	float topRoadStartY = topRoadPos.first - levelUpperPosY;
 	float topRoadEndY = topRoadStartY + roadHeight;
-	cout << topRoadStartY << endl;
+	//cout << topRoadStartY << endl;
 	bool isCollided = false;
 	vector<SDL_Rect> safeObjBoundRectVector;
 	for (Road* road : roadVector) {

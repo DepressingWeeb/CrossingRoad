@@ -13,9 +13,12 @@ enum class ResourceType {
     Train,
     Explosion,
     TrafficLight,
+    Bridge,
     Character,
     SimpleRoad,
     SimpleSafeRoad,
+    UpperWaterLane,
+    LowerWaterLane,
     Railway
 };
 

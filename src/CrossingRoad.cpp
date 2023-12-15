@@ -11,9 +11,16 @@
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_sdlrenderer.h"
 #include "imgui/imgui-knobs.h"
+#include <fstream>
+#include <tuple>
 using namespace std;
+
+
+bool cmp(tuple<string, string, int, string, string> t1, tuple<string, string, int, string, string> t2) {
+	return get<2>(t1) > get<2>(t2);
+}
+
 void quitGame() {
-	
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(gRenderer);
 	TTF_Quit();
@@ -47,6 +54,19 @@ void init() {
 	
 }
 
+void saveScore(string mode,int score,string timeFormatted, string terrainType) {
+	fstream outfile("score.txt", ios::out | ios::app);
+	time_t t = time(0);   // get time now
+	struct tm now;
+	localtime_s(&now, &t);
+	char tnow[100];
+	strftime(tnow, sizeof(tnow), "%Y-%m-%d", &now);
+	outfile << tnow << " ";
+	outfile<<mode<<" "<<score<<" "<<timeFormatted<<" "<<terrainType<<endl;
+	outfile.close();
+}
+
+
 void loadResourceCity() {
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
 	resourceManager.LoadTexture(gRenderer, ResourceType::Character, 32, "../../../resources/character/");
@@ -61,10 +81,14 @@ void loadResourceCity() {
 
 	resourceManager.LoadTexture(gRenderer, ResourceType::Explosion, 12, "../../../resources/Collision/VehicleCollision/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::TrafficLight, 2, "../../../resources/Road/Railway/TrafficLight/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Bridge, 1, "../../../resources/Road/River/Bridge/");
 
 	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleRoad, 3, "../../../resources/Road/SimpleRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleSafeRoad, 1, "../../../resources/Road/SimpleSafeRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Railway, 1, "../../../resources/Road/Railway/Rail/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::UpperWaterLane, 14, "../../../resources/Road/River/River_Upper/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::LowerWaterLane, 14, "../../../resources/Road/River/River_Lower/");
+
 }
 
 void highlightRect(SDL_Rect rectHighlight) {
@@ -89,6 +113,8 @@ void game(const vector<int>& args) {
 	AnimatingObject* collisionEffect=nullptr;
 	int currCollisionFrame = 0;
 	Character player(gRenderer, resourceManager.GetTexture(ResourceType::Character), 4, 10, 300, 610, 32, 32, 200);
+	int score;
+	Uint32 startTime = SDL_GetTicks();
 	if (args[1] == 0) {
 		RandomLevelGenerator levelGenerator(0, 100, &player);
 		bool quit = false;
@@ -129,6 +155,7 @@ void game(const vector<int>& args) {
 			ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 			SDL_RenderPresent(gRenderer);
 		}
+		score = levelGenerator.getScore();
 	}
 	else {
 		EndlessLevelGenerator levelGenerator(0, 100, &player);
@@ -169,7 +196,16 @@ void game(const vector<int>& args) {
 			ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 			SDL_RenderPresent(gRenderer);
 		}
+		score = levelGenerator.getScore();
 	}
+	Uint32 timeInMili = SDL_GetTicks() - startTime;
+	int totalSeconds = timeInMili / 1000;
+	string minutes = to_string(totalSeconds / 60);
+	string seconds = to_string(totalSeconds % 60);
+	if (minutes.size() == 1) minutes = "0" + minutes;
+	if (seconds.size() == 1) seconds = "0" + seconds;
+	string timeFormatted= minutes + ":" + seconds;
+	saveScore(args[1] == 0 ? "L" : "E", score,timeFormatted , args[0] == 0 ? "CITY" : "FOREST");
 	delete collisionEffect;
 
 }
@@ -191,9 +227,34 @@ void leaderboardScreen() {
 
 	const SDL_Rect creditMenuRect = { 534,32,-1,-1 };
 	Button* creditMenu = new Button("../../../resources/LeaderboardScreen/Button/creditMenuNormal.png", "../../../resources/LeaderboardScreen/Button/creditMenuHover.png", creditMenuRect, &creditScreen);
+
+	TTF_Font* font = TTF_OpenFont("../../../resources/Font/SuperLegendBoy.ttf", 16);
+	TTF_Font* fontScaled = TTF_OpenFont("../../../resources/Font/SuperLegendBoy.ttf", 24);
 	bool quit = false;
 	SDL_Event e;
+	
+	ifstream in("score.txt");
+	assert(in.is_open(),"The file score.txt cannot be opened");
+	vector<tuple<string, string, int, string, string>> scores;
+	string time, mode, terrainType;
+	int score;
+	string totalTime;
+	while (in >> time >> mode >> score >> totalTime >> terrainType) {
+		scores.push_back(make_tuple(time, mode, score, totalTime, terrainType));
+	}
+	in.close();
+	sort(scores.begin(), scores.end(), cmp);
 
+	const int scaledTopX = 206;
+	const int scaledTopY = 135;
+	const int totalRank = 6;
+	const int startX = 255;
+	const int startY = 290;
+	const int gapX[5] = { 213,125,120,144 };
+	const int gapY = 50;
+	int lim = scores.size() <= totalRank ? scores.size() : totalRank;
+	LTexture* text = new LTexture(gRenderer);
+	cout << scores.size() << endl;
 	while (!quit) {
 		SDL_RenderClear(gRenderer);
 		SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
@@ -217,6 +278,25 @@ void leaderboardScreen() {
 
 		creditMenu->Update(&quit);
 		creditMenu->Draw();
+		for (int rank = 0; rank < lim; rank++) {
+			tie(time, mode, score, totalTime, terrainType) = scores[rank];
+
+			text->loadFromRenderedText(time, WHITE, font);
+			text->render(startX, startY + gapY * rank, NULL, -1, -1);
+
+			text->loadFromRenderedText(mode, WHITE, font);
+			text->render(startX+gapX[0], startY + gapY * rank, NULL, -1, -1);
+
+			text->loadFromRenderedText(to_string(score), WHITE, font);
+			text->render(startX+gapX[0]+gapX[1], startY + gapY * rank, NULL, -1, -1);
+
+			text->loadFromRenderedText(totalTime, WHITE, font);
+			text->render(startX+ gapX[0] + gapX[1]+gapX[2], startY + gapY * rank, NULL, -1, -1);
+
+			text->loadFromRenderedText(terrainType, WHITE, font);
+			text->render(startX+ gapX[0] + gapX[1] + gapX[2]+gapX[3], startY + gapY * rank, NULL, -1, -1);
+		}
+		
 		if (SDL_PollEvent(&e)) {
 			ImGui_ImplSDL2_ProcessEvent(&e);
 			switch (e.type) {
@@ -236,6 +316,10 @@ void leaderboardScreen() {
 	delete settingMenu;
 	delete scoreMenu;
 	delete creditMenu;
+	delete text;
+	TTF_CloseFont(font);
+	TTF_CloseFont(fontScaled);
+
 }
 
 //Messy code,may need to optimize if enough time

@@ -24,6 +24,7 @@ public:
 	RandomLevelGenerator(int difficulty,int roadHeight,Character* player,float baseSpeed=50.f);
 	~RandomLevelGenerator();
 	bool Update(); //return true if update performed,0 if the character is dead
+	int getScore();
 	void Draw();
 	void ToFile();
 	void FromFile();

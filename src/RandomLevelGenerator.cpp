@@ -31,11 +31,12 @@ void RandomLevelGenerator::generateNewLevel() {
 	roadVector.clear();
 	int nRoad = SCREEN_HEIGHT / roadHeight; //total number of roads
 	bool isLastRoadSafe = false;
+	bool isLastRoadRiver = false;
 	for (int i = 0; i < nRoad; i++) {
 		
 		int randomInt = distribution(generator);
 		int roadType = randomInt % static_cast<int>(RoadType::Last);
-		if (isLastRoadSafe && roadType == 0) { 
+		if ((isLastRoadSafe && roadType == 0) || (isLastRoadRiver && roadType==3)) { 
 			i--;
 			continue; 
 		}
@@ -47,24 +48,38 @@ void RandomLevelGenerator::generateNewLevel() {
 		case 0:
 			roadVector.push_back(new SimpleSafeRoad(i * roadHeight, i * roadHeight + roadHeight));
 			isLastRoadSafe = true;
+			isLastRoadRiver = false;
 			break;
 		case 1:
 			numVehicle = sqrt(difficulty + 1)*2;
 			newSpeed = baseSpeed * (1.0 + 0.2 * static_cast<float>(difficulty));
 			roadVector.push_back(new SimpleRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
 			isLastRoadSafe = false;
+			isLastRoadRiver = false;
 			break;
 		case 2:
 			newSpeed = baseSpeed * 24 + (baseSpeed * difficulty*2);
 			timeRedLight = 4.f - 0.1f * static_cast<float>(difficulty);
 			timeGreenLight = 2.f + 0.1f * static_cast<float>(difficulty);
 			roadVector.push_back(new Railway(1200, 4, 4, i * roadHeight, i * roadHeight + roadHeight));
+			isLastRoadSafe = false;
+			isLastRoadRiver = false;
+			break;
+		case 3:
+			roadVector.push_back(new River(i * roadHeight, i * roadHeight + roadHeight));
+			isLastRoadSafe = false;
+			isLastRoadRiver = true;
+			break;
 		default:
 			break;
 		}
 	}
 	//Some last pixels are saved for safe road for the player to respawn safely
 	roadVector.push_back(new SimpleSafeRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
+}
+
+int RandomLevelGenerator::getScore() {
+	return totalScore;
 }
 
 bool RandomLevelGenerator::Update() {

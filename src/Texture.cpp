@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include <assert.h>
 LTexture::LTexture(SDL_Renderer* renderer)
 {
 	//Initialize
@@ -92,7 +93,6 @@ void LTexture::render(int x, int y, SDL_Rect* clip, int width , int height , SDL
 		renderQuad.w = clip->w;
 		renderQuad.h = clip->h;
 	}
-
 	//Render to screen
 	SDL_RenderCopyEx(gRenderer, mTexture, clip, &renderQuad, angle, center, flip);
 }
