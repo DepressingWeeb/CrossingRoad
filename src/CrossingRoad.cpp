@@ -116,7 +116,7 @@ void game(const vector<int>& args) {
 	int score;
 	Uint32 startTime = SDL_GetTicks();
 	if (args[1] == 0) {
-		RandomLevelGenerator levelGenerator(0, 100, &player);
+		RandomLevelGenerator levelGenerator(args[0], 0, 100, &player);
 		bool quit = false;
 		while (!quit) {
 			SDL_RenderClear(gRenderer);

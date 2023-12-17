@@ -10,6 +10,7 @@ private:
 	TTF_Font* font;
 	int roadHeight;
 	int level;
+	int terrainID;
 	int difficulty;//difficulty,increase by 1 for each level passed
 	int currScore;//score for the player in the current level, increase by 1 for each "dangerous" road passed
 	int lastLevelScore;//total score till the last level
@@ -21,7 +22,7 @@ private:
 	std::uniform_int_distribution<int> distribution;
 	void generateNewLevel();
 public:
-	RandomLevelGenerator(int difficulty,int roadHeight,Character* player,float baseSpeed=50.f);
+	RandomLevelGenerator(int terrainID,int difficulty,int roadHeight,Character* player,float baseSpeed=50.f);
 	~RandomLevelGenerator();
 	bool Update(); //return true if update performed,0 if the character is dead
 	int getScore();
