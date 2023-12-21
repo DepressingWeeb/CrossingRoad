@@ -34,6 +34,13 @@ public:
     void SetTargetPosition(int targetX, int targetY);
 protected:
     int targetX, targetY;
+    bool firstime = true;
+};
+
+class Arrow : public Monster { //Some arrow travel for a distance before stopping in the moddile of nowhere!
+public:
+    Arrow(SDL_Renderer* renderer, vector<LTexture*> textureFrames, int numFrames, int frameDuration, int x, int y, int width, int height, int speed, double scale = 1.0);
+    void Update(/*Insert Player X and y coordinate here!*/) override; //When the Monster move down, sometimes it becomes invisible (the monster texture is layered below the road texture)
 };
 
 class Train:public AnimatingObject{
