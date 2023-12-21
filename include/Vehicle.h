@@ -27,6 +27,15 @@ protected:
     SDL_Renderer* renderer;
 };
 
+class Monster : public NormalVehicle {  //Monster chase the Player with a given X and Y coordinate!
+public:
+    Monster(SDL_Renderer* renderer, vector<LTexture*> textureFrames, int numFrames, int frameDuration, int x, int y, int width, int height, int speed, double scale = 1.0);
+    void Update(/*Insert Player X and y coordinate here!*/) override; //When the Monster move down, sometimes it becomes invisible (the monster texture is layered below the road texture) 
+    void SetTargetPosition(int targetX, int targetY);
+protected:
+    int targetX, targetY;
+};
+
 class Train:public AnimatingObject{
 public:
     Train(SDL_Renderer* renderer,float y,int height, float speed, double scale = 1.0);
