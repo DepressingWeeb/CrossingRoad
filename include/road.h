@@ -28,7 +28,7 @@ public:
 
 
 class SimpleRoad:public Road {
-private:
+protected:
 	LTexture* roadTexture;
 	int nVehicle;
 	int speed;
@@ -43,6 +43,20 @@ public:
 	int getRoadID() override;
 	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
 	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};
+
+class MonsterRoad : public SimpleRoad {
+public:
+	MonsterRoad(int nMonster, int speed, int startY, int endY);
+};
+
+class EnhancedRoad : public SimpleRoad {
+public:
+    EnhancedRoad(int nVehicle, int speed, int startY, int endY);
+    void Update() override;
+
+private:
+    LTimer arrowSpawnTimer; // Timer for arrow spawning
 };
 
 class SimpleSafeRoad :public Road {

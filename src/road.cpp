@@ -52,7 +52,7 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 				break;
 			
 		}
-		AnimatingObject* newVehicle = new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY1, -1, -1, speed, scalingFactor);
+		AnimatingObject* newVehicle = new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY1, -1, -1, 1, scalingFactor);
 		roadObj.push_back(make_pair(newVehicle,0));
 		occupiedPixels.push_back(vehicleOccupyPixels);
 	}
@@ -71,7 +71,7 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 			if (!isOccupied)
 				break;
 		}
-		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY2, -1, -1, -speed, 0.25),1));
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY2, -1, -1, -1, 0.25),1));
 		occupiedPixels.push_back(vehicleOccupyPixels);
 	}
 	
@@ -121,6 +121,60 @@ vector<SDL_Rect> SimpleRoad::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
 }
 
+MonsterRoad::MonsterRoad(int nMonster, int speed, int startY, int endY) : SimpleRoad(nMonster, speed, startY, endY) {
+	// Two offset variables for rendering to the correct lane
+	int offsetY1 = (endY - startY) / 5;      // The upper lane
+	int offsetY2 = (endY - startY) / 2 + (endY - startY) / 12;  // The lower lane
+
+	// Get the resource manager instance
+	ResourceManager& resourceManager = ResourceManager::GetInstance();
+
+	const float scalingFactor = 0.25;  // Default scaling factor of vehicle resources
+
+	for (int i = 0; i < nMonster / 2; i++) {
+		// Use vehicle resources for testing
+		ResourceType randomVehicle = vehicleResources[rand() % vehicleResources.size()];
+		vector<LTexture*> vehicleTexture = resourceManager.GetTexture(randomVehicle);
+		SDL_Rect monsterOccupyPixels;
+
+		// Create Monster object and add it to the road
+		AnimatingObject* newMonster = new Monster(gRenderer, vehicleTexture, vehicleTexture.size(), 10, rand() % SCREEN_WIDTH, startY + offsetY1, -1, -1, 1, scalingFactor);
+		roadObj.push_back(make_pair(newMonster, 0));
+	}
+
+}
+
+EnhancedRoad::EnhancedRoad(int nVehicle, int speed, int startY, int endY)
+	: SimpleRoad(nVehicle, speed, startY, endY) {
+	arrowSpawnTimer.start(); // Start the arrow spawn timer
+}
+
+void EnhancedRoad::Update() {
+	// Call the base class update to handle vehicle updates
+	SimpleRoad::Update();
+
+	// Update the arrow spawn timer
+	if (arrowSpawnTimer.getTicks() >= 2000) { // 2000 milliseconds = 2 seconds
+		// Get the resource manager instance
+		ResourceManager& resourceManager = ResourceManager::GetInstance();
+ 
+		// Spawn a new arrow using vehicle resources for testing
+		ResourceType randomVehicle = vehicleResources[rand() % vehicleResources.size()];
+		vector<LTexture*> vehicleTexture = resourceManager.GetTexture(randomVehicle);
+
+		// Calculate the middle of the road
+		int middleX = (SCREEN_WIDTH - vehicleTexture[0]->getWidth()) / 2;
+
+		SDL_Rect arrowOccupyPixels;
+		arrowOccupyPixels = { middleX, startY, static_cast<int>(vehicleTexture[0]->getWidth() * 0.25), static_cast<int>(vehicleTexture[0]->getHeight() * 0.25) };
+
+		AnimatingObject* newArrow = new Arrow(gRenderer, vehicleTexture, vehicleTexture.size(), 10, arrowOccupyPixels.x, arrowOccupyPixels.y, -1, -1, 1, 0.25);
+		roadObj.push_back(make_pair(newArrow, 0));
+
+		// Reset the arrow spawn timer
+		arrowSpawnTimer.start();
+	}
+}
 
 SimpleSafeRoad::SimpleSafeRoad(int startY, int endY) {
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
