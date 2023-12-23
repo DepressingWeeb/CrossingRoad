@@ -19,7 +19,9 @@ enum class ResourceType {
     SimpleSafeRoad,
     UpperWaterLane,
     LowerWaterLane,
-    Railway
+    Railway,
+    RollingStone,
+    Timber
 };
 
 const vector<ResourceType> vehicleResources = {
