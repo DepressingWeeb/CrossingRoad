@@ -12,6 +12,7 @@ enum class RoadType {
 	SimpleRoad,
 	Railway,
 	River,
+	RollingStoneRoad,
 	Last //Last element for the purpose of randomization
 };
 class Road {

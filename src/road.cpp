@@ -469,3 +469,4 @@ vector<SDL_Rect> RollingStoneRoad::getDangerousRoadObjBoundRect() {
 vector<SDL_Rect> RollingStoneRoad::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
 }
+
