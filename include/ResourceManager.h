@@ -17,11 +17,13 @@ enum class ResourceType {
     Character,
     SimpleRoad,
     SimpleSafeRoad,
+    RollingStoneRoad,
     UpperWaterLane,
     LowerWaterLane,
     Railway,
-    RollingStone,
+    Stone,
     Timber
+    
 };
 
 const vector<ResourceType> vehicleResources = {

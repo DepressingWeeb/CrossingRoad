@@ -362,3 +362,110 @@ void River::setStartEndPosRoad(int newStartY, int newEndY) {
 int River::getRoadID() {
 	return static_cast<int>(RoadType::River);
 }
+
+RollingStoneRoad::RollingStoneRoad(int nStone, int speed, int startY, int endY) {
+	//Get resource manager instance
+	ResourceManager& resourceManager = ResourceManager::GetInstance();
+	this->roadTexture = resourceManager.GetTexture(ResourceType::RollingStoneRoad)[0];
+	this->nStone = nStone;
+	this->speed = speed;
+	this->startY = startY;
+	this->endY = endY;
+
+	//Two offset variable 
+	int offsetY1 = (endY-startY)/5;//the upper lane
+	int offsetY2 = (endY-startY)/2+ (endY - startY) / 12;//The lower lane
+
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
+
+	std::mt19937_64 generator(nanoseconds);
+
+	int minNumber = 0;
+	int maxNumber = INT_MAX;
+
+	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
+
+	const float scalingFactor = 0.25;
+	vector<SDL_Rect> occupiedPixels;
+
+	for (int i = 0; i < nStone/2; i++) {
+		vector<LTexture*> stoneTexture = resourceManager.GetTexture(ResourceType::Stone);
+		SDL_Rect stoneOccupyPixels;
+		while (true) {
+			stoneOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY + offsetY1,static_cast<int>(stoneTexture[0]->getWidth() * scalingFactor),static_cast<int>(stoneTexture[0]->getHeight() * scalingFactor)};
+			bool isOccupied = false;
+			for (SDL_Rect occupied : occupiedPixels) {
+				if (SDL_HasIntersection(&occupied, &stoneOccupyPixels))
+					isOccupied = true;
+			}
+			if (!isOccupied)
+				break;
+			
+		}
+		AnimatingObject* newStone = new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY1, -1, -1, 1, scalingFactor);
+		roadObj.push_back(make_pair(newStone,0));
+		occupiedPixels.push_back(stoneOccupyPixels);
+	}
+
+	for (int i = 0; i < nStone / 2; i++) {
+		vector<LTexture*> stoneTexture = resourceManager.GetTexture(ResourceType::Stone);
+		SDL_Rect stoneOccupyPixels;
+		while (true) {
+			stoneOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY + offsetY2,static_cast<int>(stoneTexture[0]->getWidth() * scalingFactor),static_cast<int>(stoneTexture[0]->getHeight() * scalingFactor) };
+			bool isOccupied = false;
+			for (SDL_Rect occupied : occupiedPixels) {
+				if (SDL_HasIntersection(&occupied, &stoneOccupyPixels))
+					isOccupied = true;
+			}
+			if (!isOccupied)
+				break;
+		}
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY2, -1, -1, -1, 0.25),1));
+		occupiedPixels.push_back(stoneOccupyPixels);
+	}
+}
+
+void RollingStoneRoad::Update() {
+	for (pair<AnimatingObject*,int> obj : roadObj) {
+		obj.first->Update();
+	}
+}
+void RollingStoneRoad::Draw() {
+	roadTexture->render(0, startY, NULL, SCREEN_WIDTH, endY - startY);
+	for (auto obj : roadObj) {
+		obj.first->Draw();
+	}
+}
+int RollingStoneRoad::getRoadID() {
+	//the id in enum class
+	return static_cast<int>(RoadType::RollingStoneRoad);
+}
+
+void RollingStoneRoad::setStartEndPosRoad(int newStartY, int newEndY) {
+	this->startY = newStartY;
+	this->endY = newEndY;
+	//In case there are changes in startY and endY, due to the level moving in endless mode,then update each vehicle's Y coordinate
+	int offsetY1 = (endY - startY) / 5;//the upper lane
+	int offsetY2 = (endY - startY) / 2 + (endY - startY) / 12;//The lower lane
+	for (pair<AnimatingObject*, int> obj : roadObj) {
+		if (obj.second == 0) {
+			obj.first->setYCoordinate(startY + offsetY1);
+		}
+		else {
+			obj.first->setYCoordinate(startY + offsetY2);
+		}
+	}
+}
+
+vector<SDL_Rect> RollingStoneRoad::getDangerousRoadObjBoundRect() {
+	vector<SDL_Rect> ans;
+	for (pair<AnimatingObject*,int> obj : roadObj) {
+		ans.push_back(obj.first->boundingRect());
+	}
+	return ans;
+}
+
+vector<SDL_Rect> RollingStoneRoad::getSafeRoadObjBoundRect() {
+	return vector<SDL_Rect>();
+}
