@@ -119,6 +119,20 @@ public:
 };
 
 //TODOFOREST: create new road type for forest terrain, have to inherit from class Road
+class ForestRiver : public Road {
+protected:
+	int speed;
+	int startY;
+	int endY;
+public:
+	//ForestRiver(int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};
 
 class RollingStoneRoad : public Road {
 protected:
