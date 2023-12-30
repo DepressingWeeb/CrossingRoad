@@ -472,3 +472,65 @@ vector<SDL_Rect> RollingStoneRoad::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
 }
 
+ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
+	//Get resource manager instance
+	ResourceManager& resourceManager = ResourceManager::GetInstance();
+	this->roadTexture = resourceManager.GetTexture(ResourceType::SimpleSafeRoad)[0];
+	this->n = n;
+	this->speed = speed;
+	this->startY = startY;
+	this->endY = endY;
+
+	int offsetY1 = 0;//the upper lane
+	int offsetY2 = (endY-startY)/3+ (endY - startY) / 12;//The lower lane
+	
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
+
+	std::mt19937_64 generator(nanoseconds);
+
+	int minNumber = 0;
+	int maxNumber = INT_MAX;
+
+	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
+
+	const float scalingFactor = 0.25;
+	vector<SDL_Rect> occupiedPixels;
+
+	for (int i = 0; i < n/2; i++) {
+		vector<LTexture*> stoneTexture = resourceManager.GetTexture(ResourceType::Timber);
+		SDL_Rect stoneOccupyPixels;
+		while (true) {
+			stoneOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY + offsetY1,static_cast<int>(stoneTexture[0]->getWidth() * scalingFactor),static_cast<int>(stoneTexture[0]->getHeight() * scalingFactor)};
+			bool isOccupied = false;
+			for (SDL_Rect occupied : occupiedPixels) {
+				if (SDL_HasIntersection(&occupied, &stoneOccupyPixels))
+					isOccupied = true;
+			}
+			if (!isOccupied)
+				break;
+			
+		}
+		AnimatingObject* newStone = new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY1, -1, -1, 1, scalingFactor);
+		roadObj.push_back(make_pair(newStone,0));
+		occupiedPixels.push_back(stoneOccupyPixels);
+	}
+
+	for (int i = 0; i < n / 2; i++) {
+		vector<LTexture*> stoneTexture = resourceManager.GetTexture(ResourceType::Timber);
+		SDL_Rect stoneOccupyPixels;
+		while (true) {
+			stoneOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY + offsetY2,static_cast<int>(stoneTexture[0]->getWidth() * scalingFactor),static_cast<int>(stoneTexture[0]->getHeight() * scalingFactor) };
+			bool isOccupied = false;
+			for (SDL_Rect occupied : occupiedPixels) {
+				if (SDL_HasIntersection(&occupied, &stoneOccupyPixels))
+					isOccupied = true;
+			}
+			if (!isOccupied)
+				break;
+		}
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY2, -1, -1, -1, 0.25),1));
+		occupiedPixels.push_back(stoneOccupyPixels);
+	}
+}
+
