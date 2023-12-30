@@ -121,6 +121,7 @@ public:
 };
 
 //TODOFOREST: create new road type for forest terrain, have to inherit from class Road
+/*
 class ForestRiver : public Road {
 protected:
 	LTexture* roadTexture;
@@ -138,7 +139,7 @@ public:
 	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
 	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
 };
-
+*/
 class RollingStoneRoad : public Road {
 protected:
 	LTexture* roadTexture;
