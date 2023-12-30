@@ -373,8 +373,8 @@ RollingStoneRoad::RollingStoneRoad(int nStone, int speed, int startY, int endY) 
 	this->endY = endY;
 
 	//Two offset variable 
-	int offsetY1 = (endY-startY)/5;//the upper lane
-	int offsetY2 = (endY-startY)/2+ (endY - startY) / 12;//The lower lane
+	int offsetY1 = 0;//the upper lane
+	int offsetY2 = (endY-startY)/3+ (endY - startY) / 12;//The lower lane
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
@@ -432,13 +432,15 @@ void RollingStoneRoad::Update() {
 	}
 }
 void RollingStoneRoad::Draw() {
-	roadTexture->render(0, startY, NULL, SCREEN_WIDTH, endY - startY);
+	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
+	for (int i = 0; i < nRoadRender; i++) {
+		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
 	for (auto obj : roadObj) {
 		obj.first->Draw();
 	}
 }
 int RollingStoneRoad::getRoadID() {
-	//the id in enum class
 	return static_cast<int>(RoadType::RollingStoneRoad);
 }
 
