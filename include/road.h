@@ -123,11 +123,13 @@ public:
 class ForestRiver : public Road {
 protected:
 	LTexture* roadTexture;
+	int n;
 	int speed;
 	int startY;
 	int endY;
+	vector<pair<AnimatingObject*,int>> roadObj;
 public:
-	//ForestRiver(int startY, int endY);
+	ForestRiver(int n, int speed, int startY, int endY);
 	void Update() override;
 	void Draw() override;
 	void setStartEndPosRoad(int newStartY, int newEndY) override;
