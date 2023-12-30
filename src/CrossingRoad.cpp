@@ -89,6 +89,8 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::UpperWaterLane, 14, "../../../resources/Road/River/River_Upper/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::LowerWaterLane, 14, "../../../resources/Road/River/River_Lower/");
 
+	resourceManager.LoadTexture(gRenderer, ResourceType::RollingStoneRoad, 1, "../../../resources/Road/RollingStoneRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Stone, 16, "../../../resources/stone/");
 }
 
 void highlightRect(SDL_Rect rectHighlight) {
