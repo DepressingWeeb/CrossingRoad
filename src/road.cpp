@@ -471,7 +471,7 @@ vector<SDL_Rect> RollingStoneRoad::getDangerousRoadObjBoundRect() {
 vector<SDL_Rect> RollingStoneRoad::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
 }
-
+/*
 ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 	//Get resource manager instance
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
@@ -534,3 +534,35 @@ ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 	}
 }
 
+int ForestRiver::getRoadID() {
+	return static_cast<int>(RoadType::ForestRiver);
+}
+
+void ForestRiver::setStartEndPosRoad(int newStartY, int newEndY) {
+	this->startY = newStartY;
+	this->endY = newEndY;
+	//In case there are changes in startY and endY, due to the level moving in endless mode,then update each vehicle's Y coordinate
+	int offsetY1 = (endY - startY) / 5;//the upper lane
+	int offsetY2 = (endY - startY) / 2 + (endY - startY) / 12;//The lower lane
+	for (pair<AnimatingObject*, int> obj : roadObj) {
+		if (obj.second == 0) {
+			obj.first->setYCoordinate(startY + offsetY1);
+		}
+		else {
+			obj.first->setYCoordinate(startY + offsetY2);
+		}
+	}
+}
+
+vector<SDL_Rect> ForestRiver::getDangerousRoadObjBoundRect() {
+	vector<SDL_Rect> ans;
+	for (pair<AnimatingObject*,int> obj : roadObj) {
+		ans.push_back(obj.first->boundingRect());
+	}
+	return ans;
+}
+
+vector<SDL_Rect> ForestRiver::getSafeRoadObjBoundRect() {
+	return vector<SDL_Rect>();
+}
+*/
