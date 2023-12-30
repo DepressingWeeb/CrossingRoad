@@ -91,6 +91,8 @@ void loadResourceCity() {
 
 	resourceManager.LoadTexture(gRenderer, ResourceType::RollingStoneRoad, 1, "../../../resources/Road/RollingStoneRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Stone, 16, "../../../resources/stone/");
+
+	resourceManager.LoadTexture(gRenderer, ResourceType::Timber, 8, "../../../resources/timber/");
 }
 
 void highlightRect(SDL_Rect rectHighlight) {
