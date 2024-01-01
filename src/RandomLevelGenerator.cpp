@@ -1,7 +1,7 @@
 #include "RandomLevelGenerator.h"
 
-RandomLevelGenerator::RandomLevelGenerator(int terrainID,int difficulty, int roadHeight, Character* player,float baseSpeed) {
-	
+RandomLevelGenerator::RandomLevelGenerator(int terrainID, int difficulty, int roadHeight, Character* player, float baseSpeed) {
+
 	this->roadHeight = roadHeight;
 	this->player = player;
 	this->difficulty = difficulty;
@@ -31,20 +31,22 @@ void RandomLevelGenerator::generateNewLevel() {
 	//May need biased randomization
 	roadVector.clear();
 	int nRoad = SCREEN_HEIGHT / roadHeight; //total number of roads
-	bool isLastRoadSafe = false;
-	bool isLastRoadRiver = false;
-	for (int i = 0; i < nRoad; i++) {
+	if (terrainID == 0)
+	{
+		bool isLastRoadSafe = false;
+		bool isLastRoadRiver = false;
+		for (int i = 0; i < nRoad; i++) {
 
-		int randomInt = distribution(generator);
-		int roadType = randomInt % static_cast<int>(RoadType::Last);
-		if ((isLastRoadSafe && roadType == 0) || (isLastRoadRiver && roadType == 3)) {
-			i--;
-			continue;
-		}
-		//cout << roadType << endl;
-		int numVehicle, newSpeed;
-		float timeRedLight, timeGreenLight;
-		if (terrainID == 0) {
+			int randomInt = distribution(generator);
+			int roadType;
+			roadType = randomInt % static_cast<int>(RoadType::Last);
+			if ((isLastRoadSafe && roadType == 0) || (isLastRoadRiver && roadType == 3)) {
+				i--;
+				continue;
+			}
+
+			int numVehicle, newSpeed;
+			float timeRedLight, timeGreenLight;
 			switch (roadType)
 			{
 			case 0:
@@ -72,39 +74,49 @@ void RandomLevelGenerator::generateNewLevel() {
 				isLastRoadSafe = false;
 				isLastRoadRiver = true;
 				break;
-			case 4:
-				roadVector.push_back(new SafeForestRoad(i * roadHeight, i * roadHeight + roadHeight));
-				std::cout << 1 << endl;
-				isLastRoadSafe = true;
-				isLastRoadRiver = false;
-				break;
 			default:
 				break;
 			}
 
 			//Some last pixels are saved for safe road for the player to respawn safely
-			roadVector.push_back(new SimpleSafeRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
 		}
-		else {
+		roadVector.push_back(new SimpleSafeRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
+
+	}
+	else
+	{
+		bool isLastRoadSafe = false;
+		int roadType;
+		for (int i = 0; i < nRoad; i++)
+		{
+			int randomInt = distribution(generator);
+			roadType = randomInt % static_cast<int>(ForestRoadType::Last);
+			if ((isLastRoadSafe && (roadType == 0 || roadType == 2))) {
+				i--;
+				continue;
+			}
+			int numAnimal, newSpeed;
 			switch (roadType)
 			{
 			case 0:
 				roadVector.push_back(new SafeForestRoad(i * roadHeight, i * roadHeight + roadHeight));
 				isLastRoadSafe = true;
-				isLastRoadRiver = false;
 				break;
 			case 1:
-				numVehicle = sqrt(difficulty + 1) * 2;
+				numAnimal = sqrt(difficulty + 1) * 2;
 				newSpeed = baseSpeed * (1.0 + 0.2 * static_cast<float>(difficulty));
-				roadVector.push_back(new AnimalRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				roadVector.push_back(new AnimalRoad(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
 				isLastRoadSafe = false;
-				isLastRoadRiver = false;
+				break;
+			case 2:
+				roadVector.push_back(new TreeRoad(i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = true;
 				break;
 			default:
 				break;
 			}
-			roadVector.push_back(new SafeForestRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
 		}
+		roadVector.push_back(new SafeForestRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
 	}
 }
 
@@ -119,7 +131,7 @@ bool RandomLevelGenerator::Update() {
 	if (playerRect.y <= 0) {
 		player->setCoordinate(SCREEN_WIDTH / 2, SCREEN_HEIGHT - playerRect.h - 10);
 		//if the last road(from bottom to top) is not safe
-		if(roadVector[0]->getRoadID() > 0)
+		if (roadVector[0]->getRoadID() > 0)
 			currScore++;
 		//Reset score
 		lastLevelScore += currScore;
@@ -132,12 +144,12 @@ bool RandomLevelGenerator::Update() {
 	vector<SDL_Rect> safeObjBoundRectVector;
 	for (Road* road : roadVector) {
 		road->Update();
-		isCollided|=player->checkDangerousCollision(road->getDangerousRoadObjBoundRect());
+		isCollided |= player->checkDangerousCollision(road->getDangerousRoadObjBoundRect());
 		vector<SDL_Rect> roadSafeObjBoundRects = road->getSafeRoadObjBoundRect();
 		for (SDL_Rect rect : roadSafeObjBoundRects)
 			safeObjBoundRectVector.push_back(rect);
 	}
-	
+
 	player->updateIfDeath();
 	player->updateDirection();
 	player->updateAnimation();
@@ -164,5 +176,5 @@ void RandomLevelGenerator::Draw() {
 	}
 	player->Draw();
 	//render score
-	scoreTexture->render(SCREEN_WIDTH/2, 10, NULL, -1, -1);
+	scoreTexture->render(SCREEN_WIDTH / 2, 10, NULL, -1, -1);
 }

@@ -1,10 +1,11 @@
 #include "EndlessLevelGenerator.h"
-EndlessLevelGenerator::EndlessLevelGenerator(int difficulty, int roadHeight, Character* player,float baseSpeed,float levelSpeed) {
+EndlessLevelGenerator::EndlessLevelGenerator(int terrainID ,int difficulty, int roadHeight, Character* player,float baseSpeed,float levelSpeed) {
 
 	this->roadHeight = roadHeight;
 	this->player = player;
 	this->difficulty = difficulty;
 	this->baseSpeed = baseSpeed;
+	this->terrainID = terrainID;
 	this->levelSpeed = levelSpeed;
 	this->levelUpperPosY = 0;
 	this->totalScore = 0;
@@ -66,6 +67,7 @@ void EndlessLevelGenerator::generateFirstLevel() {
 	}
 	//Some last pixels are saved for safe road for the player to respawn safely
 	roadVector.push_back(new SimpleSafeRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
+
 }
 
 void EndlessLevelGenerator::generateNewRoad() {
@@ -73,40 +75,157 @@ void EndlessLevelGenerator::generateNewRoad() {
 	bool isLastRoadSafe = (roadVector[0]->getRoadID() == 0);
 	pair<int,int> topRoadPos = roadPosVector[0];
 	int nRoad = 1; //number of roads to add each time
-	for (int i = 0; i < nRoad; i++) {
-		int randomInt = distribution(generator);
-		int roadType = randomInt % static_cast<int>(RoadType::Last);
-		if (isLastRoadSafe && roadType == 0) {
-			i--;
-			continue;
+	//for (int i = 0; i < nRoad; i++) {
+	//	int randomInt = distribution(generator);
+	//	int roadType = randomInt % static_cast<int>(RoadType::Last);
+	//	if (isLastRoadSafe && roadType == 0) {
+	//		i--;
+	//		continue;
+	//	}
+	//	//cout << roadType << endl;
+	//	int numVehicle, newSpeed;
+	//	float timeRedLight, timeGreenLight;
+	//	if (terrainID == 0)
+	//	{
+	//		switch (roadType)
+	//		{
+	//		case 0:
+	//			roadVector.insert(roadVector.begin(), new SimpleSafeRoad(i * roadHeight, i * roadHeight + roadHeight));
+	//			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+	//			isLastRoadSafe = true;
+	//			break;
+	//		case 1:
+	//			numVehicle = sqrt((difficulty / (SCREEN_WIDTH / roadHeight)) + 1) * 2;
+	//			newSpeed = baseSpeed * (1.0 + 0.04 * static_cast<float>(difficulty));
+	//			roadVector.insert(roadVector.begin(), new SimpleRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+	//			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+	//			isLastRoadSafe = false;
+	//			break;
+	//		case 2:
+	//			newSpeed = baseSpeed * 24 + (baseSpeed * difficulty) / 4;
+	//			timeRedLight = 4.f - 0.04f * static_cast<float>(difficulty);
+	//			timeGreenLight = 2.f + 0.04f * static_cast<float>(difficulty);
+	//			roadVector.insert(roadVector.begin(), new Railway(newSpeed, timeRedLight, timeGreenLight, i * roadHeight, i * roadHeight + roadHeight));
+	//			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+	//			isLastRoadSafe = false;
+	//			break;
+	//		default:
+	//			break;
+	//		}
+	//	}
+	//	else 
+	//	{
+	//		switch (roadType)
+	//		{
+	//		case 0:
+	//			roadVector.insert(roadVector.begin(), new SafeForestRoad(i * roadHeight, i * roadHeight + roadHeight));
+	//			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+	//			isLastRoadSafe = true;
+	//			break;
+	//		case 1:
+	//			numVehicle = sqrt((difficulty / (SCREEN_WIDTH / roadHeight)) + 1) * 2;
+	//			newSpeed = baseSpeed * (1.0 + 0.04 * static_cast<float>(difficulty));
+	//			roadVector.insert(roadVector.begin(), new AnimalRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+	//			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+	//			isLastRoadSafe = false;
+	//			break;
+	//		case 2:
+	//			newSpeed = baseSpeed * 24 + (baseSpeed * difficulty) / 4;
+	//			timeRedLight = 4.f - 0.04f * static_cast<float>(difficulty);
+	//			timeGreenLight = 2.f + 0.04f * static_cast<float>(difficulty);
+	//			roadVector.insert(roadVector.begin(), new Railway(newSpeed, timeRedLight, timeGreenLight, i * roadHeight, i * roadHeight + roadHeight));
+	//			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+	//			isLastRoadSafe = false;
+	//			break;
+	//		case 3:
+	//			roadVector.insert(roadVector.begin(), new TreeRoad(i * roadHeight, i * roadHeight + roadHeight));
+	//			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+	//			isLastRoadSafe = false;
+	//			break;
+	//		default:
+	//			break;
+	//		}
+
+	//	}
+	//}
+	if (terrainID == 0)
+	{
+		bool isLastRoadSafe = false;
+		for (int i = 0; i < nRoad; i++) {
+
+			int randomInt = distribution(generator);
+			int roadType = randomInt % static_cast<int>(RoadType::Last);
+			if (isLastRoadSafe && roadType == 0) {
+				i--;
+				continue;
+			}
+
+			int numVehicle, newSpeed;
+			float timeRedLight, timeGreenLight;
+			switch (roadType)
+			{
+			case 0:
+				roadVector.insert(roadVector.begin(), new SimpleSafeRoad(i * roadHeight, i * roadHeight + roadHeight));
+				roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+				isLastRoadSafe = true;
+				break;
+			case 1:
+				numVehicle = sqrt((difficulty / (SCREEN_WIDTH / roadHeight)) + 1) * 2;
+				newSpeed = baseSpeed * (1.0 + 0.04 * static_cast<float>(difficulty));
+				roadVector.insert(roadVector.begin(), new SimpleRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+				isLastRoadSafe = false;
+				break;
+			case 2:
+				newSpeed = baseSpeed * 24 + (baseSpeed * difficulty) / 4;
+				timeRedLight = 4.f - 0.04f * static_cast<float>(difficulty);
+				timeGreenLight = 2.f + 0.04f * static_cast<float>(difficulty);
+				roadVector.insert(roadVector.begin(), new Railway(newSpeed, timeRedLight, timeGreenLight, i * roadHeight, i * roadHeight + roadHeight));
+				roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+				isLastRoadSafe = false;
+				break;
+			default:
+				break;
+			}
+
+			//Some last pixels are saved for safe road for the player to respawn safely
 		}
-		//cout << roadType << endl;
-		int numVehicle, newSpeed;
-		float timeRedLight, timeGreenLight;
-		switch (roadType)
+	}
+	else
+	{
+		bool isLastRoadSafe = false;
+		int roadType;
+		for (int i = 0; i < nRoad; i++)
 		{
-		case 0:
-			roadVector.insert(roadVector.begin(),new SimpleSafeRoad(i * roadHeight, i * roadHeight + roadHeight));
-			roadPosVector.insert(roadPosVector.begin(), {topRoadPos.first-roadHeight,topRoadPos.second-roadHeight});
-			isLastRoadSafe = true;
-			break;
-		case 1:
-			numVehicle = sqrt((difficulty / (SCREEN_WIDTH / roadHeight)) + 1) * 2;
-			newSpeed = baseSpeed * (1.0 + 0.04 * static_cast<float>(difficulty));
-			roadVector.insert(roadVector.begin(),new SimpleRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
-			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
-			isLastRoadSafe = false;
-			break;
-		case 2:
-			newSpeed = baseSpeed * 24 + (baseSpeed * difficulty)/4;
-			timeRedLight = 4.f - 0.04f * static_cast<float>(difficulty);
-			timeGreenLight= 2.f + 0.04f * static_cast<float>(difficulty);
-			roadVector.insert(roadVector.begin(), new Railway(newSpeed,timeRedLight, timeGreenLight, i * roadHeight, i * roadHeight + roadHeight));
-			roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
-			isLastRoadSafe = false;
-			break;
-		default:
-			break;
+			int randomInt = distribution(generator);
+			roadType = randomInt % static_cast<int>(ForestRoadType::Last);
+			if ((isLastRoadSafe && (roadType == 0 || roadType == 2))) {
+				i--;
+				continue;
+			}
+			int numAnimal, newSpeed;
+			switch (roadType)
+			{
+			case 0:
+				roadVector.insert(roadVector.begin(), new SafeForestRoad(i * roadHeight, i * roadHeight + roadHeight));
+				roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+				isLastRoadSafe = true;
+				break;
+			case 1:
+				numAnimal = sqrt((difficulty / (SCREEN_WIDTH / roadHeight)) + 1) * 2;
+				newSpeed = baseSpeed * (1.0 + 0.04 * static_cast<float>(difficulty));
+				roadVector.insert(roadVector.begin(), new AnimalRoad(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+				isLastRoadSafe = false;
+				break;
+			case 2:
+				roadVector.insert(roadVector.begin(), new TreeRoad(i * roadHeight, i * roadHeight + roadHeight));
+				roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
+				isLastRoadSafe = true;
+				break;
+			default:
+				break;
+			}
 		}
 	}
 

@@ -22,6 +22,7 @@ enum class ResourceType {
     Railway,
     Cat,Chicken,Fox,Cow,Wolf,Boar,
     AnimalRoad,
+    Tree,
     SafeForestRoad
 };
 

@@ -11,6 +11,7 @@ private:
 	TTF_Font* font;
 	LTexture* scoreTexture;//for render score to screen
 	int roadHeight;
+	int terrainID;
 	int difficulty;//difficulty,increase by 1 for each dangerous road
 	int totalScore;//totalScore=lastLevelScore+currScore
 	//number of vehicle each road = sqrt(diff/(SCREEN_WIDTH/roadHeight)+1)*2
@@ -23,7 +24,7 @@ private:
 	void generateFirstLevel();
 	void generateNewRoad();
 public:
-	EndlessLevelGenerator(int difficulty, int roadHeight, Character* player,float baseSpeed=50.f,float levelSpeed=20.f);
+	EndlessLevelGenerator(int terrainID ,int difficulty, int roadHeight, Character* player,float baseSpeed=50.f,float levelSpeed=20.f);
 	~EndlessLevelGenerator();
 	int getScore();
 	bool Update();

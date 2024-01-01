@@ -31,7 +31,7 @@ void StaticAnimatingObject::Update() {
 void StaticAnimatingObject::Draw() {
     frames_[currentFrame_]->render(x, y, NULL, width, height);
 }
-
+ 
 void StaticAnimatingObject::setYCoordinate(float y) {
     this->y = y;
 }

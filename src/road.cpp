@@ -52,7 +52,7 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 				break;
 			
 		}
-		AnimatingObject* newVehicle = new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY1, -1, -1, 1, scalingFactor);
+		AnimatingObject* newVehicle = new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY1, -1, -1, -speed, scalingFactor);
 		roadObj.push_back(make_pair(newVehicle,0));
 		occupiedPixels.push_back(vehicleOccupyPixels);
 	}
@@ -71,7 +71,7 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 			if (!isOccupied)
 				break;
 		}
-		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY2, -1, -1, -1, 0.25),1));
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY2, -1, -1, speed, 0.25),1));
 		occupiedPixels.push_back(vehicleOccupyPixels);
 	}
 	
@@ -368,7 +368,7 @@ int River::getRoadID() {
 //==============================================SafeForestRoad================================
 SafeForestRoad::SafeForestRoad(int startY, int endY) {
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
-	this->roadTexture = resourceManager.GetTexture(ResourceType::SafeForestRoad)[0];
+	this->roadTexture = resourceManager.GetTexture(ResourceType::SafeForestRoad)[1];
 	this->startY = startY;
 	this->endY = endY;
 }
@@ -385,7 +385,7 @@ void SafeForestRoad::Draw() {
 }
 
 int SafeForestRoad::getRoadID() {
-	return static_cast<int>(RoadType::SafeForestRoad);
+	return static_cast<int>(ForestRoadType::SafeForestRoad);
 }
 
 void SafeForestRoad::setStartEndPosRoad(int newStartY, int newEndY) {
@@ -400,7 +400,7 @@ vector<SDL_Rect> SafeForestRoad::getDangerousRoadObjBoundRect() {
 vector<SDL_Rect> SafeForestRoad::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
 }
-//=================================AnimalRoad=========================
+//=================================AnimalRoad==========================================
 AnimalRoad::AnimalRoad(int nAnimal, int speed, int startY, int endY) {
 	// Get the current time in nanoseconds
 	auto currentTime = std::chrono::high_resolution_clock::now();
@@ -416,7 +416,7 @@ AnimalRoad::AnimalRoad(int nAnimal, int speed, int startY, int endY) {
 	// Define the distribution and generate the random number
 	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
-	this->roadTexture = resourceManager.GetTexture(ResourceType::AnimalRoad)[3];
+	this->roadTexture = resourceManager.GetTexture(ResourceType::AnimalRoad)[4];
 	this->nAnimal = nAnimal;
 	this->speed = speed;
 	this->startY = startY;
@@ -448,7 +448,7 @@ AnimalRoad::AnimalRoad(int nAnimal, int speed, int startY, int endY) {
 		AnimatingObject* newAnimal = new NormalAnimal(gRenderer, animalTexture, animalTexture.size(), 10, animalOccupyPixels.x, startY + offsetY1, -1, -1, speed, scalingFactor);
 		roadObj.push_back(make_pair(newAnimal, 0));
 		occupiedPixels.push_back(animalOccupyPixels);
-	}std::cout << 4 << endl;
+	}
 	for (int i = 0; i < nAnimal / 2; i++) {
 		int randomInt = distribution(generator);
 		ResourceType randomAnimal = animalResources[(randomInt % animalResources.size())];
@@ -486,7 +486,7 @@ void AnimalRoad::Draw() {
 }
 int AnimalRoad::getRoadID() {
 	//the id in enum class
-	return static_cast<int>(RoadType::AnimalRoad);
+	return static_cast<int>(ForestRoadType::AnimalRoad);
 }
 
 void AnimalRoad::setStartEndPosRoad(int newStartY, int newEndY) {
@@ -515,4 +515,84 @@ vector<SDL_Rect> AnimalRoad::getDangerousRoadObjBoundRect() {
 
 vector<SDL_Rect> AnimalRoad::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
+}
+//==============================Tree Road==============================
+TreeRoad::TreeRoad(int startY, int endY) {
+	ResourceManager& resourceManager = ResourceManager::GetInstance();
+	this->bg = resourceManager.GetTexture(ResourceType::SafeForestRoad)[1];
+	this->tree = resourceManager.GetTexture(ResourceType::Tree)[0];
+	this->startY = startY;
+	this->endY = endY;
+	// Get the current time in nanoseconds
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
+
+	// Seed the random number generator with nanoseconds
+	std::mt19937_64 generator(nanoseconds);
+
+	// Define the range for the random number
+	int minNumber = 0;
+	int maxNumber = INT_MAX;
+	// Define the distribution and generate the random number
+	std::uniform_int_distribution<int> distribution(minNumber,maxNumber);
+	std::uniform_int_distribution<int> randomTree(3, 7);
+	int randomValue = randomTree(generator);
+	double scalingFactor = 1;
+	vector<SDL_Rect> occupiedPixels;
+	for (int i = 0; i < randomValue; i++) {
+		int randomInt = distribution(generator);
+		SDL_Rect treeOccupyPixels;
+		while (true) {
+			treeOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY,static_cast<int>(this->tree->getWidth() * scalingFactor),static_cast<int>(this->tree->getHeight() * scalingFactor) };
+			bool isOccupied = false;
+			for (SDL_Rect occupied : occupiedPixels) {
+				if (SDL_HasIntersection(&occupied, &treeOccupyPixels))
+					isOccupied = true;
+			}
+			if (!isOccupied)
+				break;
+
+		}
+
+		StaticAnimatingObject*newTree = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(ResourceType::Tree), 14,4, treeOccupyPixels.x, treeOccupyPixels.y, 72,96, scalingFactor);
+		treeObj.push_back(newTree);
+		occupiedPixels.push_back(treeOccupyPixels);
+	}
+}
+
+void TreeRoad::Update() {
+	for (int i = 0; i < treeObj.size(); i++) {
+		treeObj[i]->Update();
+
+	}
+	return;
+}
+
+vector<SDL_Rect> TreeRoad::getDangerousRoadObjBoundRect() {
+	return vector<SDL_Rect>();
+}
+
+vector<SDL_Rect> TreeRoad::getSafeRoadObjBoundRect() {
+	
+	vector<SDL_Rect> ans;
+	for (auto obj : treeObj) {
+		ans.push_back(obj->boundingRect());
+	}
+	return ans;
+}
+
+void TreeRoad::Draw() {
+	bg->render(0, startY, NULL, SCREEN_WIDTH, 100);
+	for (auto p : treeObj) {
+		p->Draw();
+	}
+}
+
+void TreeRoad::setStartEndPosRoad(int newStartY, int newEndY) {
+	this->startY = newStartY;
+	this->endY = newEndY;
+}
+
+int TreeRoad::getRoadID() {
+	return static_cast<int>(ForestRoadType::TreeRoad);
 }

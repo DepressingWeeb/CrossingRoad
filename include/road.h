@@ -12,9 +12,14 @@ enum class RoadType {
 	SimpleRoad,
 	Railway,
 	River,
-	SafeForestRoad,
-	AnimalRoad,
 	Last //Last element for the purpose of randomization
+};
+enum class ForestRoadType
+{
+	SafeForestRoad=0,
+	AnimalRoad,
+	TreeRoad,
+	Last,
 };
 class Road {
 public:
@@ -147,6 +152,28 @@ protected:
 	vector<pair<AnimatingObject*, int>> roadObj;//A vector contains the pointer to the animals and an int indicates which lane the animals belong (0:upper lane,1:lower lane)
 public:
 	AnimalRoad(int nAnimal, int speed, int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};
+//=============================TreeRoad==========================
+class TreeRoad :public Road {
+private:
+
+	LTexture* bg;
+
+	LTexture* tree;
+	int startY;
+	int endY;
+	/*int bridgeX;
+	int bridgeW;
+	const float bridgeWidthHeightRatio = 0.737f;*/
+	vector<StaticAnimatingObject*>treeObj;  
+public:
+	TreeRoad(int startY, int endY);
 	void Update() override;
 	void Draw() override;
 	void setStartEndPosRoad(int newStartY, int newEndY) override;

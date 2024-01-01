@@ -94,8 +94,9 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::Railway, 1, "../../../resources/Road/Railway/Rail/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::UpperWaterLane, 14, "../../../resources/Road/River/River_Upper/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::LowerWaterLane, 14, "../../../resources/Road/River/River_Lower/");
-	resourceManager.LoadTexture(gRenderer, ResourceType::SafeForestRoad, 1, "../../../resources/Road/SimpleSafeRoad/");
-	resourceManager.LoadTexture(gRenderer, ResourceType::AnimalRoad, 4, "../../../resources/Road/SimpleRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::SafeForestRoad, 2, "../../../resources/Road/SimpleSafeRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::AnimalRoad, 5, "../../../resources/Road/SimpleRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Tree, 14, "../../../resources/tree/");
 }
 
 void highlightRect(SDL_Rect rectHighlight) {
@@ -165,7 +166,7 @@ void game(const vector<int>& args) {
 		score = levelGenerator.getScore();
 	}
 	else {
-		EndlessLevelGenerator levelGenerator(0, 100, &player);
+		EndlessLevelGenerator levelGenerator(args[0],0, 100, &player);
 		bool quit = false;
 		while (!quit) {
 			SDL_RenderClear(gRenderer);
