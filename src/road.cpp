@@ -591,6 +591,7 @@ void TreeRoad::Draw() {
 void TreeRoad::setStartEndPosRoad(int newStartY, int newEndY) {
 	this->startY = newStartY;
 	this->endY = newEndY;
+	for(auto obj:treeObj) obj->setYCoordinate(newStartY);
 }
 
 int TreeRoad::getRoadID() {
