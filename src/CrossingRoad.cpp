@@ -97,6 +97,8 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::SafeForestRoad, 2, "../../../resources/Road/SimpleSafeRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::AnimalRoad, 5, "../../../resources/Road/SimpleRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Tree, 14, "../../../resources/tree/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Flower, 14, "../../../resources/flower/");
+
 }
 
 void highlightRect(SDL_Rect rectHighlight) {

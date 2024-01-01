@@ -23,6 +23,7 @@ enum class ResourceType {
     Cat,Chicken,Fox,Cow,Wolf,Boar,
     AnimalRoad,
     Tree,
+    Flower,
     SafeForestRoad
 };
 

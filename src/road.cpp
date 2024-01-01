@@ -371,9 +371,49 @@ SafeForestRoad::SafeForestRoad(int startY, int endY) {
 	this->roadTexture = resourceManager.GetTexture(ResourceType::SafeForestRoad)[1];
 	this->startY = startY;
 	this->endY = endY;
+	this->flower = resourceManager.GetTexture(ResourceType::Flower)[0];
+	// Get the current time in nanoseconds
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
+
+	// Seed the random number generator with nanoseconds
+	std::mt19937_64 generator(nanoseconds);
+
+	// Define the range for the random number
+	int minNumber = 0;
+	int maxNumber = INT_MAX;
+	// Define the distribution and generate the random number
+	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
+	std::uniform_int_distribution<int> randomFlower(8, 12);
+	int randomValue = randomFlower(generator);
+	double scalingFactor = 2;
+	vector<SDL_Rect> occupiedPixels;
+	for (int i = 0; i < randomValue; i++) {
+		int randomInt = distribution(generator);
+		SDL_Rect flowerOccupyPixels;
+		while (true) {
+			flowerOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY,static_cast<int>(this->flower->getWidth() * scalingFactor),static_cast<int>(this->flower->getHeight() * scalingFactor) };
+			bool isOccupied = false;
+			for (SDL_Rect occupied : occupiedPixels) {
+				if (SDL_HasIntersection(&occupied, &flowerOccupyPixels))
+					isOccupied = true;
+			}
+			if (!isOccupied)
+				break;
+
+		}
+
+		StaticAnimatingObject* newFlower = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(ResourceType::Flower), 14, 10, flowerOccupyPixels.x, flowerOccupyPixels.y, -1, -1, scalingFactor);
+		flowerObj.push_back(newFlower);
+		occupiedPixels.push_back(flowerOccupyPixels);
+	}
 }
 
 void SafeForestRoad::Update() {
+	for (int i = 0; i < flowerObj.size(); i++) {
+		flowerObj[i]->Update();
+
+	}
 	return;
 }
 
@@ -381,6 +421,9 @@ void SafeForestRoad::Draw() {
 	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
 	for (int i = 0; i < nRoadRender; i++) {
 		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
+	for (auto p : flowerObj) {
+		p->Draw();
 	}
 }
 
@@ -391,6 +434,7 @@ int SafeForestRoad::getRoadID() {
 void SafeForestRoad::setStartEndPosRoad(int newStartY, int newEndY) {
 	this->startY = newStartY;
 	this->endY = newEndY;
+	for (auto obj : flowerObj) obj->setYCoordinate(newStartY);
 }
 
 vector<SDL_Rect> SafeForestRoad::getDangerousRoadObjBoundRect() {

@@ -130,8 +130,10 @@ public:
 class SafeForestRoad :public Road {
 private:
 	LTexture* roadTexture;
+	LTexture* flower;
 	int startY;
 	int endY;
+	vector<StaticAnimatingObject*>flowerObj;
 public:
 	SafeForestRoad(int startY, int endY);
 	void Update() override;
@@ -164,13 +166,9 @@ class TreeRoad :public Road {
 private:
 
 	LTexture* bg;
-
 	LTexture* tree;
 	int startY;
 	int endY;
-	/*int bridgeX;
-	int bridgeW;
-	const float bridgeWidthHeightRatio = 0.737f;*/
 	vector<StaticAnimatingObject*>treeObj;  
 public:
 	TreeRoad(int startY, int endY);
