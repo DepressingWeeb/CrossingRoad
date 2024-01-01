@@ -23,7 +23,6 @@ enum class ResourceType {
     Railway,
     Stone,
     Timber
-    
 };
 
 const vector<ResourceType> vehicleResources = {

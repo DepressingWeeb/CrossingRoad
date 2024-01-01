@@ -471,7 +471,7 @@ vector<SDL_Rect> RollingStoneRoad::getDangerousRoadObjBoundRect() {
 vector<SDL_Rect> RollingStoneRoad::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
 }
-/*
+
 ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 	//Get resource manager instance
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
@@ -481,8 +481,7 @@ ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 	this->startY = startY;
 	this->endY = endY;
 
-	int offsetY1 = 0;//the upper lane
-	int offsetY2 = (endY-startY)/3+ (endY - startY) / 12;//The lower lane
+	int offsetY = (endY-startY)/2;//The lower lane
 	
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
@@ -498,39 +497,48 @@ ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 	vector<SDL_Rect> occupiedPixels;
 
 	for (int i = 0; i < n/2; i++) {
-		vector<LTexture*> stoneTexture = resourceManager.GetTexture(ResourceType::Timber);
-		SDL_Rect stoneOccupyPixels;
+		vector<LTexture*> timberTexture = resourceManager.GetTexture(ResourceType::Timber);
+		SDL_Rect timberOccupyPixels;
 		while (true) {
-			stoneOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY + offsetY1,static_cast<int>(stoneTexture[0]->getWidth() * scalingFactor),static_cast<int>(stoneTexture[0]->getHeight() * scalingFactor)};
+			timberOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY,static_cast<int>(timberTexture[0]->getWidth() * scalingFactor),static_cast<int>(timberTexture[0]->getHeight() * scalingFactor)};
 			bool isOccupied = false;
 			for (SDL_Rect occupied : occupiedPixels) {
-				if (SDL_HasIntersection(&occupied, &stoneOccupyPixels))
+				if (SDL_HasIntersection(&occupied, &timberOccupyPixels))
 					isOccupied = true;
 			}
 			if (!isOccupied)
 				break;
 			
 		}
-		AnimatingObject* newStone = new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY1, -1, -1, 1, scalingFactor);
-		roadObj.push_back(make_pair(newStone,0));
-		occupiedPixels.push_back(stoneOccupyPixels);
+		AnimatingObject* newTimber = new NormalVehicle(gRenderer, timberTexture, timberTexture.size(), 10, timberOccupyPixels.x, startY, -1, -1, 1, scalingFactor);
+		roadObj.push_back(make_pair(newTimber,0));
+		occupiedPixels.push_back(timberOccupyPixels);
 	}
 
 	for (int i = 0; i < n / 2; i++) {
-		vector<LTexture*> stoneTexture = resourceManager.GetTexture(ResourceType::Timber);
-		SDL_Rect stoneOccupyPixels;
+		vector<LTexture*> timberTexture = resourceManager.GetTexture(ResourceType::Timber);
+		SDL_Rect timberOccupyPixels;
 		while (true) {
-			stoneOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY + offsetY2,static_cast<int>(stoneTexture[0]->getWidth() * scalingFactor),static_cast<int>(stoneTexture[0]->getHeight() * scalingFactor) };
+			timberOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY + offsetY,static_cast<int>(timberTexture[0]->getWidth() * scalingFactor),static_cast<int>(timberTexture[0]->getHeight() * scalingFactor) };
 			bool isOccupied = false;
 			for (SDL_Rect occupied : occupiedPixels) {
-				if (SDL_HasIntersection(&occupied, &stoneOccupyPixels))
+				if (SDL_HasIntersection(&occupied, &timberOccupyPixels))
 					isOccupied = true;
 			}
 			if (!isOccupied)
 				break;
 		}
-		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY2, -1, -1, -1, 0.25),1));
-		occupiedPixels.push_back(stoneOccupyPixels);
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, timberTexture, timberTexture.size(), 10, timberOccupyPixels.x, startY + offsetY, -1, -1, -1, 0.25),1));
+		occupiedPixels.push_back(timberOccupyPixels);
+	}
+
+	int tileHeight = (endY - startY) / 2;
+	int tileWidth = tileHeight;
+	int nPairTile = ceil(SCREEN_WIDTH / static_cast<float>(tileWidth));
+	for (int i = 0; i < nPairTile; i++) {
+		StaticAnimatingObject* upperWaterTile = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(ResourceType::UpperWaterLane), 14, 4, i * tileWidth, startY, tileWidth, tileHeight);
+		StaticAnimatingObject* lowerWaterTile = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(ResourceType::LowerWaterLane), 14, 4, i * tileWidth, startY+tileHeight, tileWidth, tileHeight);
+		this->waters.push_back(make_pair(upperWaterTile, lowerWaterTile));
 	}
 }
 
@@ -565,4 +573,23 @@ vector<SDL_Rect> ForestRiver::getDangerousRoadObjBoundRect() {
 vector<SDL_Rect> ForestRiver::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
 }
-*/
+
+void ForestRiver::Update() {
+	for (pair<AnimatingObject*,int> obj : roadObj) {
+		obj.first->Update();
+	}
+	for (int i = 0; i < waters.size(); i++) {
+		waters[i].first->Update();
+		waters[i].second->Update();
+	}
+}
+void ForestRiver::Draw() {
+	roadTexture->render(0, startY, NULL,SCREEN_WIDTH, endY - startY);
+	for (auto p : waters) {
+		p.first->Draw();
+		p.second->Draw();
+	}
+	for (auto obj : roadObj) {
+		obj.first->Draw();
+	}
+}
