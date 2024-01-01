@@ -12,6 +12,8 @@ enum class RoadType {
 	SimpleRoad,
 	Railway,
 	River,
+	SafeForestRoad,
+	AnimalRoad,
 	Last //Last element for the purpose of randomization
 };
 class Road {
@@ -119,3 +121,36 @@ public:
 };
 
 //TODOFOREST: create new road type for forest terrain, have to inherit from class Road
+
+class SafeForestRoad :public Road {
+private:
+	LTexture* roadTexture;
+	int startY;
+	int endY;
+public:
+	SafeForestRoad(int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};
+//=======================AnimalRoad=======================
+class AnimalRoad :public Road {
+protected:
+	LTexture* roadTexture;
+	int nAnimal;
+	int speed;
+	int startY;
+	int endY;
+	vector<pair<AnimatingObject*, int>> roadObj;//A vector contains the pointer to the animals and an int indicates which lane the animals belong (0:upper lane,1:lower lane)
+public:
+	AnimalRoad(int nAnimal, int speed, int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};

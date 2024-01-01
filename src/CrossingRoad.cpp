@@ -76,9 +76,15 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::BlackViper, 1, "../../../resources/vehicle/blackviper/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Ambulance, 3, "../../../resources/vehicle/ambulance/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::PoliceCar, 3, "../../../resources/vehicle/police/");
-
 	resourceManager.LoadTexture(gRenderer, ResourceType::Train, 2, "../../../resources/vehicle/train/");
-
+	//animal
+	resourceManager.LoadTexture(gRenderer, ResourceType::Cat, 8, "../../../resources/animal/cat/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Fox, 8, "../../../resources/animal/fox/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Boar, 5, "../../../resources/animal/boar/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Chicken, 6, "../../../resources/animal/chicken/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Wolf, 6, "../../../resources/animal/wolf/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Cow, 5, "../../../resources/animal/cow/");
+	//
 	resourceManager.LoadTexture(gRenderer, ResourceType::Explosion, 12, "../../../resources/Collision/VehicleCollision/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::TrafficLight, 2, "../../../resources/Road/Railway/TrafficLight/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Bridge, 1, "../../../resources/Road/River/Bridge/");
@@ -88,7 +94,8 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::Railway, 1, "../../../resources/Road/Railway/Rail/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::UpperWaterLane, 14, "../../../resources/Road/River/River_Upper/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::LowerWaterLane, 14, "../../../resources/Road/River/River_Lower/");
-
+	resourceManager.LoadTexture(gRenderer, ResourceType::SafeForestRoad, 1, "../../../resources/Road/SimpleSafeRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::AnimalRoad, 4, "../../../resources/Road/SimpleRoad/");
 }
 
 void highlightRect(SDL_Rect rectHighlight) {

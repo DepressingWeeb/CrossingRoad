@@ -19,7 +19,10 @@ enum class ResourceType {
     SimpleSafeRoad,
     UpperWaterLane,
     LowerWaterLane,
-    Railway
+    Railway,
+    Cat,Chicken,Fox,Cow,Wolf,Boar,
+    AnimalRoad,
+    SafeForestRoad
 };
 
 const vector<ResourceType> vehicleResources = {
@@ -28,6 +31,14 @@ const vector<ResourceType> vehicleResources = {
     ResourceType::BlackViper,
     ResourceType::Taxi,
     ResourceType::PoliceCar
+};
+const vector<ResourceType> animalResources ={
+     ResourceType::Cat,
+     ResourceType::Fox,
+     ResourceType::Chicken,
+     ResourceType::Cow,
+     ResourceType::Boar,
+     ResourceType::Wolf
 };
 //using Singleton pattern for ResourceManager
 class ResourceManager {

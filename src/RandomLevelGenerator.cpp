@@ -72,6 +72,12 @@ void RandomLevelGenerator::generateNewLevel() {
 				isLastRoadSafe = false;
 				isLastRoadRiver = true;
 				break;
+			case 4:
+				roadVector.push_back(new SafeForestRoad(i * roadHeight, i * roadHeight + roadHeight));
+				std::cout << 1 << endl;
+				isLastRoadSafe = true;
+				isLastRoadRiver = false;
+				break;
 			default:
 				break;
 			}
@@ -80,7 +86,24 @@ void RandomLevelGenerator::generateNewLevel() {
 			roadVector.push_back(new SimpleSafeRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
 		}
 		else {
-			return;
+			switch (roadType)
+			{
+			case 0:
+				roadVector.push_back(new SafeForestRoad(i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = true;
+				isLastRoadRiver = false;
+				break;
+			case 1:
+				numVehicle = sqrt(difficulty + 1) * 2;
+				newSpeed = baseSpeed * (1.0 + 0.2 * static_cast<float>(difficulty));
+				roadVector.push_back(new AnimalRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = false;
+				isLastRoadRiver = false;
+				break;
+			default:
+				break;
+			}
+			roadVector.push_back(new SafeForestRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
 		}
 	}
 }
