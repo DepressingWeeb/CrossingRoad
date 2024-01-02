@@ -215,3 +215,62 @@ void Train::Update() {
         }
     }
 }
+
+/*
+Timber::Timber(SDL_Renderer* renderer,float y,int height, float speed, double scale) {
+    this->renderer = renderer;
+    this->speed = speed;
+    this->y = y;
+    this->height = height;
+    ResourceManager& resourceManager = ResourceManager::GetInstance();
+    this->timberTexture = resourceManager.GetTexture(ResourceType::Timber)[0];
+}
+
+int Timber::getYCoordinate() {
+    return y;
+}
+
+void Timber::Draw() {
+  
+}
+
+void Train::setYCoordinate(float y) {
+    this->y = y;
+    for (int i = 0; i < trainCurrCoord.size(); i++) {
+        trainCurrCoord[i].first.y = this->y;
+        //cout<<trainCurrCoord[i].first.y << " " << this->y << endl;
+    }
+}
+
+SDL_Rect Train::boundingRect() {
+    if (trainCurrCoord.size() == 0)
+        return { -9,-9,9,9 };
+    SDL_Rect first = trainCurrCoord[0].first;
+    SDL_Rect last = trainCurrCoord[trainCurrCoord.size() - 1].first;
+    //cout << "Before: " << last.y <<" "<< last.y + first.h << endl;
+    return { last.x,last.y+10,first.x + first.w - last.x-10,first.h-10 };
+}
+
+void Train::Update() {
+    
+    float timeStep = stepTimer.getTicks() / 1000.f;
+    stepTimer.start();
+    for (int i = 0; i < trainCurrCoord.size(); i++) {
+        trainCurrCoord[i].first.x += floor(speed * timeStep);
+    }
+    if (trainCurrCoord.size()>0 && trainCurrCoord[0].first.x > SCREEN_WIDTH) {
+        trainCurrCoord.erase(trainCurrCoord.begin());
+    }
+    if (!isRedLight) {
+        if (trainCurrCoord.size() == 0) {
+            trainCurrCoord.push_back({{ -trainHeadTexture->getWidth(),static_cast<int>(y),trainHeadTexture->getWidth(),height },TrainTextureType::TRAIN_HEAD});
+        }
+        else {
+            SDL_Rect last = trainCurrCoord[trainCurrCoord.size() - 1].first;
+            if (last.x > 0) {
+                trainCurrCoord.push_back({ { last.x - trainPartTexture->getWidth(),static_cast<int>(y),trainPartTexture->getWidth(),height },TrainTextureType::TRAIN_PART });
+            }
+        }
+    }
+}
+*/
