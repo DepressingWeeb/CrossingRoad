@@ -510,7 +510,7 @@ ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 				break;
 			
 		}
-		AnimatingObject* newTimber = new NormalVehicle(gRenderer, timberTexture, timberTexture.size(), 10, timberOccupyPixels.x, startY, -1, -1, 1, scalingFactor);
+		AnimatingObject* newTimber = new NormalVehicle(gRenderer, timberTexture, timberTexture.size(), 10, timberOccupyPixels.x, startY, -1, -1, speed, scalingFactor);
 		roadObj.push_back(make_pair(newTimber,0));
 		occupiedPixels.push_back(timberOccupyPixels);
 	}
@@ -528,7 +528,7 @@ ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 			if (!isOccupied)
 				break;
 		}
-		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, timberTexture, timberTexture.size(), 10, timberOccupyPixels.x, startY + offsetY, -1, -1, -1, scalingFactor),1));
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, timberTexture, timberTexture.size(), 10, timberOccupyPixels.x, startY + offsetY, -1, -1, -speed, scalingFactor),1));
 		occupiedPixels.push_back(timberOccupyPixels);
 	}
 
