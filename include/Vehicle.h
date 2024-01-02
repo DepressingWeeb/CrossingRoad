@@ -67,3 +67,20 @@ protected:
     LTexture* trainPartTexture;
     SDL_Renderer* renderer;
 };//TODO
+/*
+class Timber: public AnimatingObject {
+public:
+    Timber(SDL_Renderer* renderer,float y,int height, float speed, double scale = 1.0);
+    void Update() override;
+    void Draw() override;
+    int getYCoordinate() override;
+    void setYCoordinate(float y) override;
+    SDL_Rect boundingRect();
+protected:
+    LTexture* timberTexture;
+    float y;
+    int height;
+    float speed;
+    SDL_Renderer* renderer;
+};
+*/

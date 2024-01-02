@@ -493,7 +493,7 @@ ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 
 	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
 
-	const float scalingFactor = 0.25;
+	const float scalingFactor = 0.5;
 	vector<SDL_Rect> occupiedPixels;
 
 	for (int i = 0; i < n/2; i++) {
@@ -515,7 +515,7 @@ ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 		occupiedPixels.push_back(timberOccupyPixels);
 	}
 
-	for (int i = 0; i < n / 2; i++) {
+	for (int i = 0; i < n/2; i++) {
 		vector<LTexture*> timberTexture = resourceManager.GetTexture(ResourceType::Timber);
 		SDL_Rect timberOccupyPixels;
 		while (true) {
@@ -528,7 +528,7 @@ ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 			if (!isOccupied)
 				break;
 		}
-		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, timberTexture, timberTexture.size(), 10, timberOccupyPixels.x, startY + offsetY, -1, -1, -1, 0.25),1));
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, timberTexture, timberTexture.size(), 10, timberOccupyPixels.x, startY + offsetY, -1, -1, -1, scalingFactor),1));
 		occupiedPixels.push_back(timberOccupyPixels);
 	}
 
@@ -550,8 +550,8 @@ void ForestRiver::setStartEndPosRoad(int newStartY, int newEndY) {
 	this->startY = newStartY;
 	this->endY = newEndY;
 	//In case there are changes in startY and endY, due to the level moving in endless mode,then update each vehicle's Y coordinate
-	int offsetY1 = (endY - startY) / 5;//the upper lane
-	int offsetY2 = (endY - startY) / 2 + (endY - startY) / 12;//The lower lane
+	int offsetY1 = 0;//the upper lane
+	int offsetY2 = (endY - startY) / 2;//The lower lane
 	for (pair<AnimatingObject*, int> obj : roadObj) {
 		if (obj.second == 0) {
 			obj.first->setYCoordinate(startY + offsetY1);
@@ -564,14 +564,60 @@ void ForestRiver::setStartEndPosRoad(int newStartY, int newEndY) {
 
 vector<SDL_Rect> ForestRiver::getDangerousRoadObjBoundRect() {
 	vector<SDL_Rect> ans;
-	for (pair<AnimatingObject*,int> obj : roadObj) {
-		ans.push_back(obj.first->boundingRect());
+	int index = 0;
+	for (auto it = roadObj.begin(); it != roadObj.end(); ++it) { 
+		SDL_Rect rect;
+		pair<AnimatingObject*,int> obj = *it;
+		if (index < n/2) {
+			if (index == 0) {
+				rect = {0, startY, obj.first->boundingRect().x, (endY - startY)/2};
+				ans.push_back(rect);
+			}
+			else {
+				--it;
+				pair<AnimatingObject*, int>& prevObj = *it;
+				it++;
+				rect = {prevObj.first->boundingRect().x + prevObj.first->boundingRect().w, startY, obj.first->boundingRect().x - prevObj.first->boundingRect().x - prevObj.first->boundingRect().w, (endY - startY)/2};
+				ans.push_back(rect);
+			}
+			if (index == n/2 - 1) {
+				rect = {obj.first->boundingRect().x + obj.first->boundingRect().w, startY, SCREEN_WIDTH - obj.first->boundingRect().x - obj.first->boundingRect().w, (endY - startY)/2};
+				ans.push_back(rect);
+			}
+			index += 1;
+		}
+		else {
+			if (index == n/2) {
+				rect = {0, startY + (endY - startY)/2, obj.first->boundingRect().x, (endY - startY)/2};
+				ans.push_back(rect);
+			}
+			else {
+				--it;
+				pair<AnimatingObject*, int>& prevObj = *it;
+				it++;
+				rect = {prevObj.first->boundingRect().x + prevObj.first->boundingRect().w, startY + (endY - startY)/2, obj.first->boundingRect().x - prevObj.first->boundingRect().x - prevObj.first->boundingRect().w, (endY - startY)/2};
+				ans.push_back(rect);
+			}
+			if (index == n - 1) {
+				rect = {obj.first->boundingRect().x + obj.first->boundingRect().w, startY+(endY - startY)/2, SCREEN_WIDTH - obj.first->boundingRect().x - obj.first->boundingRect().w, (endY - startY)/2};
+				ans.push_back(rect);
+			}
+			index += 1;
+		}
+
 	}
 	return ans;
 }
 
 vector<SDL_Rect> ForestRiver::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
+	/*
+	vector<SDL_Rect> ans;
+	for (pair<AnimatingObject*,int> obj : roadObj) {
+		ans.push_back(obj.first->boundingRect());
+	}
+	return ans;
+	*/
 }
 
 void ForestRiver::Update() {
