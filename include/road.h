@@ -7,12 +7,25 @@
 #include "global.h"
 #include "Vehicle.h"
 #include "StaticAnimatingObject.h"
-enum class RoadType {
+#include "Monster.h"
+#include "Animal.h"
+enum class CityRoadType {
 	SimpleSafeRoad=0,
 	SimpleRoad,
 	Railway,
 	River,
 	Last //Last element for the purpose of randomization
+};
+
+enum class ForestRoadType
+{
+	SafeForestRoad = 0,
+	AnimalRoad,
+	TreeRoad,
+	MonsterRoad,
+	RollingStoneRoad,
+	ForestRiver,
+	Last,
 };
 class Road {
 public:
@@ -45,19 +58,6 @@ public:
 	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
 };
 
-class MonsterRoad : public SimpleRoad {
-public:
-	MonsterRoad(int nMonster, int speed, int startY, int endY);
-};
-
-class EnhancedRoad : public SimpleRoad {
-public:
-    EnhancedRoad(int nVehicle, int speed, int startY, int endY);
-    void Update() override;
-
-private:
-    LTimer arrowSpawnTimer; // Timer for arrow spawning
-};
 
 class SimpleSafeRoad :public Road {
 private:
@@ -119,3 +119,110 @@ public:
 };
 
 //TODOFOREST: create new road type for forest terrain, have to inherit from class Road
+class SafeForestRoad :public Road {
+private:
+	LTexture* roadTexture;
+	LTexture* flower;
+	int startY;
+	int endY;
+	vector<StaticAnimatingObject*>flowerObj;
+public:
+	SafeForestRoad(int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};
+//=======================AnimalRoad=======================
+class AnimalRoad :public Road {
+protected:
+	LTexture* roadTexture;
+	int nAnimal;
+	int speed;
+	int startY;
+	int endY;
+	vector<pair<AnimatingObject*, int>> roadObj;//A vector contains the pointer to the animals and an int indicates which lane the animals belong (0:upper lane,1:lower lane)
+public:
+	AnimalRoad(int nAnimal, int speed, int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};
+//=============================TreeRoad==========================
+class TreeRoad :public Road {
+private:
+
+	LTexture* bg;
+	int startY;
+	int endY;
+	vector<StaticAnimatingObject*>treeObj;
+public:
+	TreeRoad(int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};
+class MonsterRoad : public Road {
+private:
+	LTexture* roadTexture;
+	int startY;
+	int endY;
+	float timeIdle;
+	float timeArrow;
+	int arrowSpeed;
+	Monster* archer;
+	vector<StaticAnimatingObject*> decoratorObj;
+public:
+	MonsterRoad(float timeIdle, float timeArrow, int arrowSpeed, int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};
+
+class ForestRiver : public Road {
+protected:
+	LTexture* roadTexture;
+	int n;
+	int speed;
+	int startY;
+	int endY;
+	vector<pair<AnimatingObject*, int>> roadObj;
+	vector<pair<StaticAnimatingObject*, StaticAnimatingObject*>> waters;
+public:
+	ForestRiver(int n, int speed, int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};
+
+class RollingStoneRoad : public Road {
+protected:
+	LTexture* roadTexture;
+	int nStone;
+	int speed;
+	int startY;
+	int endY;
+	vector<pair<AnimatingObject*, int>> roadObj;
+public:
+	RollingStoneRoad(int nStone, int speed, int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};

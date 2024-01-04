@@ -20,10 +20,11 @@ private:
 	LTimer stepTimer;
 	std::mt19937_64 generator;//random engine
 	std::uniform_int_distribution<int> distribution;
+	int terrainID;
 	void generateFirstLevel();
 	void generateNewRoad();
 public:
-	EndlessLevelGenerator(int difficulty, int roadHeight, Character* player,float baseSpeed=50.f,float levelSpeed=20.f);
+	EndlessLevelGenerator(int difficulty, int roadHeight, Character* player,int terrainID=0,float baseSpeed=50.f,float levelSpeed=20.f);
 	~EndlessLevelGenerator();
 	int getScore();
 	bool Update();

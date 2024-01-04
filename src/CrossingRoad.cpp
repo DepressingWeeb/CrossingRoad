@@ -79,15 +79,47 @@ void loadResourceCity() {
 
 	resourceManager.LoadTexture(gRenderer, ResourceType::Train, 2, "../../../resources/vehicle/train/");
 
+	//animal
+	resourceManager.LoadTexture(gRenderer, ResourceType::Cat, 8, "../../../resources/animal/cat/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Fox, 8, "../../../resources/animal/fox/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Boar, 5, "../../../resources/animal/boar/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Chicken, 6, "../../../resources/animal/chicken/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Wolf, 6, "../../../resources/animal/wolf/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Cow, 5, "../../../resources/animal/cow/");
+
 	resourceManager.LoadTexture(gRenderer, ResourceType::Explosion, 12, "../../../resources/Collision/VehicleCollision/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::TrafficLight, 2, "../../../resources/Road/Railway/TrafficLight/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Bridge, 1, "../../../resources/Road/River/Bridge/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Tree, 14, "../../../resources/Decorator/tree/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Flower, 14, "../../../resources/Decorator/flower/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Bush, 14, "../../../resources/Decorator/Bush/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Grass, 9, "../../../resources/Decorator/Grass/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Stone, 4, "../../../resources/Road/RollingStoneRoad/stone/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Timber, 8, "../../../resources/Road/ForestRiver/timber/");
 
 	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleRoad, 3, "../../../resources/Road/SimpleRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleSafeRoad, 1, "../../../resources/Road/SimpleSafeRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Railway, 1, "../../../resources/Road/Railway/Rail/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::UpperWaterLane, 14, "../../../resources/Road/River/River_Upper/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::LowerWaterLane, 14, "../../../resources/Road/River/River_Lower/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::SafeForestRoad, 1, "../../../resources/Road/SafeForestRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::AnimalRoad, 1, "../../../resources/Road/AnimalRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::MonsterRoad, 1, "../../../resources/Road/MonsterRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::RollingStoneRoad, 1, "../../../resources/Road/RollingStoneRoad/");
+	
+
+	//temporary
+	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_IDLE, 12, "../../../resources/Monster/Archer/idle/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ATTACK_1, 15, "../../../resources/Monster/Archer/1_atk/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ATTACK_2, 12, "../../../resources/Monster/Archer/2_atk/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ARROW, 1, "../../../resources/Monster/Archer/projectiles_and_effects/arrow/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ARROW_EFFECT_1, 8, "../../../resources/Monster/Archer/projectiles_and_effects/arrow_hit_entangle/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ARROW_EFFECT_2, 8, "../../../resources/Monster/Archer/projectiles_and_effects/arrow_hit_poison/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ARROW_EFFECT_SHOWER, 18, "../../../resources/Monster/Archer/projectiles_and_effects/arrow_shower_effect/");
+
+	
+	
+
 
 }
 
@@ -116,7 +148,7 @@ void game(const vector<int>& args) {
 	int score;
 	Uint32 startTime = SDL_GetTicks();
 	if (args[1] == 0) {
-		RandomLevelGenerator levelGenerator(0, 100, &player);
+		RandomLevelGenerator levelGenerator(0, 100, &player,args[0]);
 		bool quit = false;
 		while (!quit) {
 			SDL_RenderClear(gRenderer);
@@ -158,7 +190,7 @@ void game(const vector<int>& args) {
 		score = levelGenerator.getScore();
 	}
 	else {
-		EndlessLevelGenerator levelGenerator(0, 100, &player);
+		EndlessLevelGenerator levelGenerator(0, 100, &player,args[0]);
 		bool quit = false;
 		while (!quit) {
 			SDL_RenderClear(gRenderer);

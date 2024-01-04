@@ -15,11 +15,29 @@ enum class ResourceType {
     TrafficLight,
     Bridge,
     Character,
+    Archer_IDLE,
+    Archer_ATTACK_1,
+    Archer_ATTACK_2,
+    Archer_ARROW,
+    Archer_ARROW_EFFECT_1,
+    Archer_ARROW_EFFECT_2,
+    Archer_ARROW_EFFECT_SHOWER,
     SimpleRoad,
     SimpleSafeRoad,
     UpperWaterLane,
     LowerWaterLane,
-    Railway
+    Railway,
+    Cat, Chicken, Fox, Cow, Wolf, Boar,
+    AnimalRoad,
+    Tree,
+    Flower,
+    Bush,
+    Grass,
+    SafeForestRoad,
+    MonsterRoad,
+    RollingStoneRoad,
+    Stone,
+    Timber
 };
 
 const vector<ResourceType> vehicleResources = {
@@ -28,6 +46,15 @@ const vector<ResourceType> vehicleResources = {
     ResourceType::BlackViper,
     ResourceType::Taxi,
     ResourceType::PoliceCar
+};
+
+const vector<ResourceType> animalResources = {
+     ResourceType::Cat,
+     ResourceType::Fox,
+     ResourceType::Chicken,
+     ResourceType::Cow,
+     ResourceType::Boar,
+     ResourceType::Wolf
 };
 //using Singleton pattern for ResourceManager
 class ResourceManager {

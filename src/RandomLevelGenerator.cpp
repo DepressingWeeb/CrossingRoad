@@ -1,6 +1,6 @@
 #include "RandomLevelGenerator.h"
 
-RandomLevelGenerator::RandomLevelGenerator(int difficulty, int roadHeight, Character* player,float baseSpeed) {
+RandomLevelGenerator::RandomLevelGenerator(int difficulty, int roadHeight, Character* player,int terrainID,float baseSpeed) {
 	
 	this->roadHeight = roadHeight;
 	this->player = player;
@@ -16,6 +16,7 @@ RandomLevelGenerator::RandomLevelGenerator(int difficulty, int roadHeight, Chara
 	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
 	generator = std::mt19937_64(nanoseconds);
 	distribution = std::uniform_int_distribution<int>(0, INT_MAX);
+	this->terrainID = terrainID;
 	generateNewLevel();
 }
 
@@ -33,49 +34,100 @@ void RandomLevelGenerator::generateNewLevel() {
 	bool isLastRoadSafe = false;
 	bool isLastRoadRiver = false;
 	for (int i = 0; i < nRoad; i++) {
-		
+
 		int randomInt = distribution(generator);
-		int roadType = randomInt % static_cast<int>(RoadType::Last);
-		if ((isLastRoadSafe && roadType == 0) || (isLastRoadRiver && roadType==3)) { 
-			i--;
-			continue; 
+		if (terrainID == 0) {
+			int roadType = randomInt % static_cast<int>(CityRoadType::Last);
+			if ((isLastRoadSafe && roadType == 0) || (isLastRoadRiver && roadType == 3)) {
+				i--;
+				continue;
+			}
+			//cout << roadType << endl;
+			int numVehicle, newSpeed;
+			float timeRedLight, timeGreenLight;
+			switch (roadType)
+			{
+			case 0:
+				roadVector.push_back(new SimpleSafeRoad(i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = true;
+				isLastRoadRiver = false;
+				break;
+			case 1:
+				numVehicle = sqrt(difficulty + 1) * 2;
+				newSpeed = baseSpeed * (1.0 + 0.2 * static_cast<float>(difficulty));
+				roadVector.push_back(new SimpleRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = false;
+				isLastRoadRiver = false;
+				break;
+			case 2:
+				
+				newSpeed = baseSpeed * 24 + (baseSpeed * difficulty*2);
+				timeRedLight = 4.f - 0.1f * static_cast<float>(difficulty);
+				timeGreenLight = 2.f + 0.1f * static_cast<float>(difficulty);
+				roadVector.push_back(new Railway(1200, 4, 4, i * roadHeight, i * roadHeight + roadHeight));
+				break;
+			case 3:
+				roadVector.push_back(new River(i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = false;
+				isLastRoadRiver = true;
+				break;
+			default:
+				break;
+			}
 		}
-		//cout << roadType << endl;
-		int numVehicle, newSpeed;
-		float timeRedLight, timeGreenLight;
-		switch (roadType)
-		{
-		case 0:
-			roadVector.push_back(new SimpleSafeRoad(i * roadHeight, i * roadHeight + roadHeight));
-			isLastRoadSafe = true;
-			isLastRoadRiver = false;
-			break;
-		case 1:
-			numVehicle = sqrt(difficulty + 1)*2;
-			newSpeed = baseSpeed * (1.0 + 0.2 * static_cast<float>(difficulty));
-			roadVector.push_back(new SimpleRoad(numVehicle, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
-			isLastRoadSafe = false;
-			isLastRoadRiver = false;
-			break;
-		case 2:
-			newSpeed = baseSpeed * 24 + (baseSpeed * difficulty*2);
-			timeRedLight = 4.f - 0.1f * static_cast<float>(difficulty);
-			timeGreenLight = 2.f + 0.1f * static_cast<float>(difficulty);
-			roadVector.push_back(new Railway(1200, 4, 4, i * roadHeight, i * roadHeight + roadHeight));
-			isLastRoadSafe = false;
-			isLastRoadRiver = false;
-			break;
-		case 3:
-			roadVector.push_back(new River(i * roadHeight, i * roadHeight + roadHeight));
-			isLastRoadSafe = false;
-			isLastRoadRiver = true;
-			break;
-		default:
-			break;
+		else {
+			int roadType = randomInt % static_cast<int>(ForestRoadType::Last);
+			if ((isLastRoadSafe && roadType == 0) || (isLastRoadRiver && roadType == 3)) {
+				i--;
+				continue;
+			}
+			int numAnimal, newSpeed;
+			switch (roadType)
+			{
+			case 0:
+				roadVector.push_back(new SafeForestRoad(i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = true;
+				break;
+			case 1:
+				numAnimal = sqrt(difficulty + 1) * 2;
+				newSpeed = baseSpeed * (1.0 + 0.2 * static_cast<float>(difficulty));
+				roadVector.push_back(new AnimalRoad(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = false;
+				break;
+			case 2:
+				roadVector.push_back(new TreeRoad(i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = true;
+				break;
+			case 3:
+				roadVector.push_back(new MonsterRoad(5.0f, 1.5f, 500, i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = false;
+				isLastRoadRiver = false;
+				break;
+			case 4:
+				numAnimal = sqrt(difficulty + 1) * 2;
+				newSpeed = baseSpeed * (1.0 + 0.2 * static_cast<float>(difficulty));
+				roadVector.push_back(new RollingStoneRoad(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = false;
+				isLastRoadRiver = false;
+				break;
+			case 5:
+				numAnimal = 6;
+				newSpeed = baseSpeed * (1.0 + 0.2 * static_cast<float>(difficulty));
+				roadVector.push_back(new ForestRiver(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = false;
+				isLastRoadRiver = true;
+				break;
+			default:
+				break;
+			}
 		}
 	}
 	//Some last pixels are saved for safe road for the player to respawn safely
-	roadVector.push_back(new SimpleSafeRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
+	if (terrainID == 0)
+		roadVector.push_back(new SimpleSafeRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
+	else
+		roadVector.push_back(new SafeForestRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
+	cout <<"Road vcetor size: " << roadVector.size() << endl;
 }
 
 int RandomLevelGenerator::getScore() {
