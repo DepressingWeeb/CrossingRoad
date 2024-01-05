@@ -29,13 +29,13 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 	this->startY = startY;
 	this->endY = endY;
 	//Two offset variable for rendering to the correct lane
-	int offsetY1 = (endY-startY)/5;//the upper lane
-	int offsetY2 = (endY-startY)/2+ (endY - startY) / 12;//The lower lane
+	int offsetY1 = (endY - startY) / 12;//the upper lane
+	int offsetY2 = (endY - startY) / 3 + (endY - startY) / 6;//The lower lane
 	//Get the resourceManager instance
 	
 	vector<SDL_Rect> occupiedPixels;
 
-	const float scalingFactor = 0.25;	// Default scaling factor of vehicle resources
+	const float scalingFactor = 0.4;	// Default scaling factor of vehicle resources
 	//The two loop below randomize the vehicle for each lane and check for overlapping vehicle
 	for (int i = 0; i < nVehicle/2; i++) {
 		int randomInt = distribution(generator);
@@ -72,7 +72,7 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 			if (!isOccupied)
 				break;
 		}
-		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY2, -1, -1, -speed, 0.25),1));
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY2, -1, -1, -speed, scalingFactor),1));
 		occupiedPixels.push_back(vehicleOccupyPixels);
 	}
 	
@@ -102,8 +102,8 @@ void SimpleRoad::setStartEndPosRoad(int newStartY, int newEndY) {
 	this->startY = newStartY;
 	this->endY = newEndY;
 	//In case there are changes in startY and endY, due to the level moving in endless mode,then update each vehicle's Y coordinate
-	int offsetY1 = (endY - startY) / 5;//the upper lane
-	int offsetY2 = (endY - startY) / 2 + (endY - startY) / 12;//The lower lane
+	int offsetY1 = (endY - startY) / 12;//the upper lane
+	int offsetY2 = (endY - startY) / 3 + (endY - startY) / 6;//The lower lane
 	for (pair<AnimatingObject*, int> obj : roadObj) {
 		if (obj.second == 0) {
 			obj.first->setYCoordinate(startY + offsetY1);
@@ -131,16 +131,64 @@ SimpleSafeRoad::SimpleSafeRoad(int startY, int endY) {
 	this->roadTexture = resourceManager.GetTexture(ResourceType::SimpleSafeRoad)[0];
 	this->startY = startY;
 	this->endY = endY;
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
+
+	// Seed the random number generator with nanoseconds
+	std::mt19937_64 generator(nanoseconds);
+
+	// Define the range for the random number
+	int minNumber = 0;
+	int maxNumber = INT_MAX;
+	// Define the distribution and generate the random number
+	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
+	std::uniform_int_distribution<int> randomVendor(3, 4);
+	int randomValue = randomVendor(generator);
+	double scalingFactor = 0.5;
+	vector<SDL_Rect> occupiedPixels;
+	for (int i = 0; i < randomValue; i++) {
+		int randomInt = distribution(generator);
+		ResourceType randomVendor = vendorResources[(randomInt % vendorResources.size())];
+		this->vendor = resourceManager.GetTexture(randomVendor)[0];
+		SDL_Rect vendorOccupyPixels;
+		while (true) {
+			int randomX;
+			if (distribution(generator) % 2 == 0) {
+    			// Random x-coordinate in the range [0, 200]
+    			randomX = distribution(generator) % 201;
+			} else {
+    			// Random x-coordinate in the range [400, 1200]
+    			randomX = 400 + distribution(generator) % 801;
+			}
+			vendorOccupyPixels = { randomX ,startY ,static_cast<int>(this->vendor->getWidth() * scalingFactor),static_cast<int>(this->vendor->getHeight() * scalingFactor)};
+			bool isOccupied = false;
+			for (SDL_Rect occupied : occupiedPixels) {
+				if (SDL_HasIntersection(&occupied, &vendorOccupyPixels))
+					isOccupied = true;
+			}
+			if (!isOccupied)
+				break;
+		}
+		StaticAnimatingObject* newVendor = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(randomVendor), 4, 10, vendorOccupyPixels.x, vendorOccupyPixels.y, -1, -1, scalingFactor);
+		vendorObj.push_back(newVendor);
+		occupiedPixels.push_back(vendorOccupyPixels);
+	}
 }
 
 void SimpleSafeRoad::Update() {
-	return;
+	for (int i = 0; i < vendorObj.size(); i++) {
+		vendorObj[i]->Update();
+
+	}
 }
 
 void SimpleSafeRoad::Draw() {
 	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
 	for (int i = 0; i < nRoadRender; i++) {
 		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
+	for (auto p : vendorObj) {
+		p->Draw();
 	}
 }
 
@@ -158,7 +206,16 @@ vector<SDL_Rect> SimpleSafeRoad::getDangerousRoadObjBoundRect() {
 }
 
 vector<SDL_Rect> SimpleSafeRoad::getSafeRoadObjBoundRect() {
-	return vector<SDL_Rect>();
+	vector<SDL_Rect> ans;
+	for (auto obj : vendorObj) {
+		SDL_Rect rect;
+		rect.x = obj->boundingRect().x + obj->boundingRect().w / 4;
+		rect.y = obj->boundingRect().y + obj->boundingRect().h / 4;
+		rect.w = obj->boundingRect().w - obj->boundingRect().w / 2;
+		rect.h = obj->boundingRect().h - obj->boundingRect().h / 3;
+		ans.push_back(rect);
+	}
+	return ans;
 }
 
 Railway::Railway(int speed, float timeTrafficLightRed, float timeTrafficLightGreen, int startY, int endY) {
@@ -313,13 +370,97 @@ int River::getRoadID() {
 	return static_cast<int>(CityRoadType::River);
 }
 
+ConstructionSite::ConstructionSite(int startY, int endY) {
+	ResourceManager& resourceManager = ResourceManager::GetInstance();
+	this->roadTexture = resourceManager.GetTexture(ResourceType::ConstructionSite)[0];
+	this->startY = startY;
+	this->endY = endY;
+
+	int offset = (endY - startY) / 8;
+	// Get the current time in nanoseconds
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
+
+	// Seed the random number generator with nanoseconds
+	std::mt19937_64 generator(nanoseconds);
+
+	// Define the range for the random number
+	int minNumber = 0;
+	int maxNumber = INT_MAX;
+	// Define the distribution and generate the random number
+	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
+	std::uniform_int_distribution<int> random(3, 6);
+	int randomValue = random(generator);
+	double scalingFactor = 1;
+	vector<SDL_Rect> occupiedPixels;
+	for (int i = 0; i < randomValue; i++) {
+		int randomInt = distribution(generator);
+		ResourceType randomDanger = dangerResources[(randomInt % dangerResources.size())];
+		this->danger = resourceManager.GetTexture(randomDanger)[0];
+		SDL_Rect dangerOccupyPixels;
+		while (true) {    		
+			dangerOccupyPixels = {distribution(generator) % SCREEN_WIDTH ,startY + offset ,static_cast<int>(this->danger->getWidth() * scalingFactor),static_cast<int>(this->danger->getHeight() * scalingFactor)};
+			bool isOccupied = false;
+			for (SDL_Rect occupied : occupiedPixels) {
+				if (SDL_HasIntersection(&occupied, &dangerOccupyPixels))
+					isOccupied = true;
+			}
+			if (!isOccupied)
+				break;
+		}
+		StaticAnimatingObject* newDanger = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(randomDanger), 1, 10, dangerOccupyPixels.x, dangerOccupyPixels.y, -1, -1, scalingFactor);
+		dangerObj.push_back(newDanger);
+		occupiedPixels.push_back(dangerOccupyPixels);
+	};
+}
+
+void ConstructionSite::Update() {
+	return;
+}
+
+vector<SDL_Rect> ConstructionSite::getDangerousRoadObjBoundRect() {
+	return vector<SDL_Rect>();
+}
+
+vector<SDL_Rect> ConstructionSite::getSafeRoadObjBoundRect() {
+	vector<SDL_Rect> ans;
+	for (auto obj : dangerObj) {
+		SDL_Rect rect;
+		rect.x = obj->boundingRect().x + obj->boundingRect().w / 4;
+		rect.y = obj->boundingRect().y + obj->boundingRect().h / 4;
+		rect.w = obj->boundingRect().w - obj->boundingRect().w / 2;
+		rect.h = obj->boundingRect().h - obj->boundingRect().h / 3;
+		ans.push_back(rect);
+	}
+	return ans;
+}
+
+void ConstructionSite::Draw() {
+	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
+	for (int i = 0; i < nRoadRender; i++) {
+		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
+	for (auto p : dangerObj) {
+		p->Draw();
+	}
+}
+
+void ConstructionSite::setStartEndPosRoad(int newStartY, int newEndY) {
+	this->startY = newStartY;
+	this->endY = newEndY;
+}
+
+int ConstructionSite::getRoadID() {
+	return static_cast<int>(CityRoadType::ConstructionSite);
+}
+
+
 //==============================================SafeForestRoad================================
 SafeForestRoad::SafeForestRoad(int startY, int endY) {
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
 	this->roadTexture = resourceManager.GetTexture(ResourceType::SafeForestRoad)[0];
 	this->startY = startY;
 	this->endY = endY;
-	this->flower = resourceManager.GetTexture(ResourceType::Flower)[0];
 	// Get the current time in nanoseconds
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
@@ -577,7 +718,10 @@ vector<SDL_Rect> TreeRoad::getSafeRoadObjBoundRect() {
 }
 
 void TreeRoad::Draw() {
-	bg->render(0, startY, NULL, SCREEN_WIDTH, endY-startY);
+	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(bg->getWidth()));
+	for (int i = 0; i < nRoadRender; i++) {
+		bg->render(bg->getWidth() * i, startY, NULL, bg->getWidth(), endY - startY);
+	}
 	for (auto p : treeObj) {
 		p->Draw();
 	}
