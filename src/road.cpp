@@ -403,7 +403,7 @@ RollingStoneRoad::RollingStoneRoad(int nStone, int speed, int startY, int endY) 
 				break;
 			
 		}
-		AnimatingObject* newStone = new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY1, -1, -1, 1, scalingFactor);
+		AnimatingObject* newStone = new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY1, -1, -1, speed, scalingFactor);
 		roadObj.push_back(make_pair(newStone,0));
 		occupiedPixels.push_back(stoneOccupyPixels);
 	}
@@ -421,7 +421,7 @@ RollingStoneRoad::RollingStoneRoad(int nStone, int speed, int startY, int endY) 
 			if (!isOccupied)
 				break;
 		}
-		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY2, -1, -1, -1, 0.25),1));
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY2, -1, -1, -speed, 0.25),1));
 		occupiedPixels.push_back(stoneOccupyPixels);
 	}
 }
