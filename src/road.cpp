@@ -83,7 +83,11 @@ void SimpleRoad::Update() {
 	}
 }
 void SimpleRoad::Draw() {
-	roadTexture->render(0, startY, NULL, SCREEN_WIDTH, endY - startY);
+	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
+	for (int i = 0; i < nRoadRender; i++) {
+		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
+	//roadTexture->render(0, startY, NULL, SCREEN_WIDTH, endY - startY);
 	for (auto obj : roadObj) {
 		obj.first->Draw();
 	}
