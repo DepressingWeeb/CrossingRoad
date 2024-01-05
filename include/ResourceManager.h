@@ -24,7 +24,6 @@ enum class ResourceType {
     Archer_ARROW_EFFECT_SHOWER,
     SimpleRoad,
     SimpleSafeRoad,
-    RollingStoneRoad,
     UpperWaterLane,
     LowerWaterLane,
     Railway,
