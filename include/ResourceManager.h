@@ -27,6 +27,7 @@ enum class ResourceType {
     UpperWaterLane,
     LowerWaterLane,
     Railway,
+    ConstructionSite,
     Cat, Chicken, Fox, Cow, Wolf, Boar,
     AnimalRoad,
     Tree,
@@ -37,7 +38,21 @@ enum class ResourceType {
     MonsterRoad,
     RollingStoneRoad,
     Stone,
-    Timber
+    Timber,
+    Vendor_1,
+    Vendor_2,
+    Danger_1,
+    Danger_2
+};
+
+const vector<ResourceType> vendorResources = {
+    ResourceType::Vendor_1,
+    ResourceType::Vendor_2
+};
+
+const vector<ResourceType> dangerResources = {
+    ResourceType::Danger_1,
+    ResourceType::Danger_2
 };
 
 const vector<ResourceType> vehicleResources = {

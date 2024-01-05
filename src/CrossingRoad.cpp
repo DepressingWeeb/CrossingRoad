@@ -78,7 +78,10 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::PoliceCar, 3, "../../../resources/vehicle/police/");
 
 	resourceManager.LoadTexture(gRenderer, ResourceType::Train, 2, "../../../resources/vehicle/train/");
-
+	resourceManager.LoadTexture(gRenderer, ResourceType::Vendor_1, 4, "../../../resources/Decorator/vendor/vendor1/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Vendor_2, 4, "../../../resources/Decorator/vendor/vendor2/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Danger_1, 1, "../../../resources/Road/ConstructionSite/danger/danger1/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Danger_2, 1, "../../../resources/Road/ConstructionSite/danger/danger2/");
 	//animal
 	resourceManager.LoadTexture(gRenderer, ResourceType::Cat, 8, "../../../resources/animal/cat/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Fox, 8, "../../../resources/animal/fox/");
@@ -106,6 +109,8 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::AnimalRoad, 1, "../../../resources/Road/AnimalRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::MonsterRoad, 1, "../../../resources/Road/MonsterRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::RollingStoneRoad, 1, "../../../resources/Road/RollingStoneRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::ConstructionSite, 1, "../../../resources/Road/ConstructionSite/road/");
+
 	
 
 	//temporary

@@ -71,6 +71,13 @@ void EndlessLevelGenerator::generateFirstLevel() {
 				isLastRoadSafe = false;
 				isLastRoadRiver = true;
 				break;
+
+			case 4:
+				roadVector.push_back(new ConstructionSite(i * roadHeight, i * roadHeight + roadHeight));
+				roadPosVector.push_back(make_pair(i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = true;
+				isLastRoadRiver = false;
+				break;
 			default:
 				break;
 			}

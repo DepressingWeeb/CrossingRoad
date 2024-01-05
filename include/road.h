@@ -14,8 +14,7 @@ enum class CityRoadType {
 	SimpleRoad,
 	Railway,
 	River,
-	RollingStoneRoad,
-	ForestRiver,
+	ConstructionSite,
 	Last //Last element for the purpose of randomization
 };
 
@@ -64,8 +63,10 @@ public:
 class SimpleSafeRoad :public Road {
 private:
 	LTexture* roadTexture;
+	LTexture* vendor;
 	int startY;
 	int endY;
+	vector<StaticAnimatingObject*> vendorObj;
 public:
 	SimpleSafeRoad(int startY, int endY);
 	void Update() override;
@@ -118,6 +119,23 @@ public:
 	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
 	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
 	
+};
+
+class ConstructionSite:public Road {
+private:
+	LTexture* roadTexture;
+	int startY;
+	int endY;
+	LTexture* danger;
+	vector<StaticAnimatingObject*> dangerObj;
+public:
+	ConstructionSite(int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
 };
 
 //TODOFOREST: create new road type for forest terrain, have to inherit from class Road
@@ -228,4 +246,6 @@ public:
 	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
 	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
 };
+
+
 

@@ -60,7 +60,6 @@ void RandomLevelGenerator::generateNewLevel() {
 				isLastRoadRiver = false;
 				break;
 			case 2:
-				
 				newSpeed = baseSpeed * 24 + (baseSpeed * difficulty*2);
 				timeRedLight = 4.f - 0.1f * static_cast<float>(difficulty);
 				timeGreenLight = 2.f + 0.1f * static_cast<float>(difficulty);
@@ -71,6 +70,10 @@ void RandomLevelGenerator::generateNewLevel() {
 				isLastRoadSafe = false;
 				isLastRoadRiver = true;
 				break;
+			case 4:
+				roadVector.push_back(new ConstructionSite(i * roadHeight, i * roadHeight + roadHeight));
+				isLastRoadSafe = true;
+				isLastRoadRiver = false;
 			default:
 				break;
 			}
