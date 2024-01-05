@@ -18,7 +18,7 @@ NormalVehicle::NormalVehicle(SDL_Renderer* renderer, vector<LTexture*> textureFr
     }
 }
 SDL_Rect NormalVehicle::boundingRect() {
-    return { static_cast<int>(x) + 10,static_cast<int>(y) + 10,width - 10,height - 10 };//May need to edit to set hit box manually in the future
+    return { static_cast<int>(x) + 10,static_cast<int>(y) + 10,width - 20,height - 20 };//May need to edit to set hit box manually in the future
 }
 void NormalVehicle::Update() {
     //update animation frames
@@ -54,96 +54,6 @@ int NormalVehicle::getYCoordinate() {
     return y;
 }
 
-Monster::Monster(SDL_Renderer* renderer, vector<LTexture*> textureFrames, int numFrames, int frameDuration, int x, int y, int width, int height, int speed, double scale)
-    : NormalVehicle(renderer, textureFrames, numFrames, frameDuration, x, y, width, height, speed, scale), targetX(0), targetY(0) {
-    // Additional initialization for Monster if needed
-}
-
-void Monster::Update(/*Insert Player X and y coordinate here!*/) {
-    // Update animation frames
-    frameCounter_++;
-    if (frameCounter_ >= frameDuration_) {
-        currentFrame_ = (currentFrame_ + 1) % numFrames_;
-        frameCounter_ = 0;
-    }
-
-    // Calculate the direction towards the target position
-    float deltaX = targetX - x;
-    float deltaY = targetY - y;
-    float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
-
-    // Normalize the direction vector
-    if (distance > 0) {
-        deltaX /= distance;
-        deltaY /= distance;
-    }
-
-    // Update the vehicle's position based on the direction towards the target
-    x += speed * deltaX;
-    y += speed * deltaY;
-
-    // Generate random values for playerX and playerY for testing
-    int playerX = rand() % SCREEN_WIDTH;  // Assuming SCREEN_WIDTH is the maximum X-coordinate
-    int playerY = rand() % SCREEN_HEIGHT; // Assuming SCREEN_HEIGHT is the maximum Y-coordinate
-
-    //The Monster move to a new target!
-
-    SetTargetPosition(playerX, playerY);
-
-
-    // Additional logic if needed
-
-    // Call the parent class's Update function
-    NormalVehicle::Update();
-}
-
-Arrow::Arrow(SDL_Renderer* renderer, vector<LTexture*> textureFrames, int numFrames, int frameDuration, int x, int y, int width, int height, int speed, double scale)
-    : Monster(renderer, textureFrames, numFrames, frameDuration, x, y, width, height, speed, scale){}
-
-void Arrow::Update(/*Insert Player X and y coordinate here!*/) {
-    // Update animation frames
-    frameCounter_++;
-    if (frameCounter_ >= frameDuration_) {
-        currentFrame_ = (currentFrame_ + 1) % numFrames_;
-        frameCounter_ = 0;
-    }
-
-    // Calculate the direction towards the target position
-    float deltaX = targetX - x;
-    float deltaY = targetY - y;
-    float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
-
-    // Normalize the direction vector
-    if (distance > 0) {
-        deltaX /= distance;
-        deltaY /= distance;
-    }
-
-    // Update the vehicle's position based on the direction towards the target
-    x += speed * deltaX;
-    y += speed * deltaY;
-
-    // Generate random values for playerX and playerY for testing
-    int playerX = rand() % SCREEN_WIDTH;  // Assuming SCREEN_WIDTH is the maximum X-coordinate
-    int playerY = rand() % SCREEN_HEIGHT; // Assuming SCREEN_HEIGHT is the maximum Y-coordinate
-
-    //The Monster move to a new target!
-    if (firstime) {
-        SetTargetPosition(playerX, playerY);
-        firstime = false;
-    }
-
-
-    // Additional logic if needed
-
-    // Call the parent class's Update function
-    NormalVehicle::Update();
-}
-
-void Monster::SetTargetPosition(int targetX, int targetY) {
-    this->targetX = targetX;
-    this->targetY = targetY;
-}
 
 Train::Train(SDL_Renderer* renderer,float y,int height, float speed, double scale) {
     this->renderer = renderer;

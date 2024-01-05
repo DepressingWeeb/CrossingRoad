@@ -39,6 +39,7 @@ bool Character::checkDangerousCollision(const vector<SDL_Rect>& dangerousObjBoun
     SDL_Rect characterRect = { x,y+20,width,height-20 };
     for (SDL_Rect objRect : dangerousObjBoundRectVector) {
         if (SDL_HasIntersection(&characterRect, &objRect)) {
+            cout << "Danger Object : " << objRect.x << " " << objRect.y << " " << objRect.w << " " << objRect.h << endl;
             isDeath = true;
             return true;
         }
@@ -118,10 +119,12 @@ void Character::updateCoordinate(const vector<SDL_Rect>& safeObjBoundRectVector)
     
     //If the updated coordinate intersect with any of the safeObj (Obstacles),undo the change
     bool isIntersectSafeObj = false;
-    SDL_Rect characterRect = { x,y + 20,width,height };
+    SDL_Rect characterRect = { x,y + 20,width,height-20 };
     for (SDL_Rect objRect : safeObjBoundRectVector) {
         if (SDL_HasIntersection(&characterRect, &objRect)) {
             isIntersectSafeObj = true;
+            //cout << "Character : " << characterRect.x << " " << characterRect.y << " " << characterRect.w << " " << characterRect.h << endl;
+            //cout << "Object : " << objRect.x << " " << objRect.y << " " << objRect.w << " " << objRect.h << endl;
             break;
         }
     }

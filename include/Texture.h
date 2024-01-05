@@ -4,6 +4,7 @@
 #include "SDL_ttf.h"
 #include <string>
 #include <iostream>
+#include <assert.h>
 using namespace std;
 class LTexture{
 public:

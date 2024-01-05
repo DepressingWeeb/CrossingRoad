@@ -31,7 +31,7 @@ bool LTexture::loadFromFile(string path)
 	//The final texture
 	SDL_Texture* newTexture = NULL;
 	newTexture = IMG_LoadTexture(gRenderer, path.c_str());
-	if (newTexture == NULL) cout << "Fail to load texture" << endl;
+	if (newTexture == NULL) cout << "Fail to load texture : " <<path<< endl;
 	mTexture = newTexture;
 	SDL_QueryTexture(mTexture, NULL, NULL, &mWidth, &mHeight);
 	return mTexture != NULL;

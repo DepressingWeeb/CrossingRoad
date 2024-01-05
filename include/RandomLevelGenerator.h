@@ -19,9 +19,10 @@ private:
 	//number of vehicle each road = sqrt(diff+1)*2
 	std::mt19937_64 generator;//random engine
 	std::uniform_int_distribution<int> distribution;
+	int terrainID;
 	void generateNewLevel();
 public:
-	RandomLevelGenerator(int difficulty,int roadHeight,Character* player,float baseSpeed=50.f);
+	RandomLevelGenerator(int difficulty,int roadHeight,Character* player,int terrainID=0,float baseSpeed=50.f);
 	~RandomLevelGenerator();
 	bool Update(); //return true if update performed,0 if the character is dead
 	int getScore();
