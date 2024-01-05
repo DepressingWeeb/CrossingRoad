@@ -97,7 +97,7 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::Stone, 4, "../../../resources/Road/RollingStoneRoad/stone/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Timber, 8, "../../../resources/Road/ForestRiver/timber/");
 
-	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleRoad, 3, "../../../resources/Road/SimpleRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleRoad, 1, "../../../resources/Road/SimpleRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleSafeRoad, 1, "../../../resources/Road/SimpleSafeRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Railway, 1, "../../../resources/Road/Railway/Rail/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::UpperWaterLane, 14, "../../../resources/Road/River/River_Upper/");
