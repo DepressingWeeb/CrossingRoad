@@ -112,9 +112,11 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_IDLE, 12, "../../../resources/Monster/Archer/idle/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ATTACK_1, 15, "../../../resources/Monster/Archer/1_atk/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ATTACK_2, 12, "../../../resources/Monster/Archer/2_atk/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ATTACK_3, 17, "../../../resources/Monster/Archer/sp_atk/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ARROW, 1, "../../../resources/Monster/Archer/projectiles_and_effects/arrow/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ARROW_EFFECT_1, 8, "../../../resources/Monster/Archer/projectiles_and_effects/arrow_hit_entangle/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ARROW_EFFECT_2, 8, "../../../resources/Monster/Archer/projectiles_and_effects/arrow_hit_poison/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ARROW_EFFECT_SPECIAL, 9, "../../../resources/Monster/Archer/projectiles_and_effects/beam_extension_effect/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Archer_ARROW_EFFECT_SHOWER, 18, "../../../resources/Monster/Archer/projectiles_and_effects/arrow_shower_effect/");
 
 	
@@ -147,6 +149,7 @@ void game(const vector<int>& args) {
 	Character player(gRenderer, resourceManager.GetTexture(ResourceType::Character), 4, 10, 300, 610, 32, 32, 200);
 	int score;
 	Uint32 startTime = SDL_GetTicks();
+	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 	if (args[1] == 0) {
 		RandomLevelGenerator levelGenerator(0, 100, &player,args[0]);
 		bool quit = false;

@@ -193,6 +193,8 @@ public:
 class ForestRiver : public Road {
 protected:
 	LTexture* roadTexture;
+	LTimer stepTimer;
+	Character* player;
 	int n;
 	int speed;
 	int startY;
@@ -200,7 +202,7 @@ protected:
 	vector<pair<AnimatingObject*, int>> roadObj;
 	vector<pair<StaticAnimatingObject*, StaticAnimatingObject*>> waters;
 public:
-	ForestRiver(int n, int speed, int startY, int endY);
+	ForestRiver(int n, int speed, int startY, int endY,Character* player);
 	void Update() override;
 	void Draw() override;
 	void setStartEndPosRoad(int newStartY, int newEndY) override;

@@ -148,9 +148,17 @@ SDL_Rect Character::getBoundingRect() {
     return { static_cast<int>(x),static_cast<int>(y),width,height };
 }
 
-void Character::setCoordinate(int x, int y) {
+pair<float, float> Character::getCoordinate() {
+    return make_pair(x, y);
+}
+
+void Character::setCoordinate(float x, float y) {
     this->x = x;
     this->y = y;
+}
+
+void Character::setXCoordinate(float x) {
+    this->x = x;
 }
 
 void Character::setLevelSpeed(float newSpeed) {

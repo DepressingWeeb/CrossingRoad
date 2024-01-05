@@ -113,7 +113,7 @@ void RandomLevelGenerator::generateNewLevel() {
 			case 5:
 				numAnimal = 6;
 				newSpeed = baseSpeed * (1.0 + 0.2 * static_cast<float>(difficulty));
-				roadVector.push_back(new ForestRiver(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				roadVector.push_back(new ForestRiver(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight,player));
 				isLastRoadSafe = false;
 				isLastRoadRiver = true;
 				break;

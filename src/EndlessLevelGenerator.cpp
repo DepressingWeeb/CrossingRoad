@@ -118,7 +118,7 @@ void EndlessLevelGenerator::generateFirstLevel() {
 			case 5:
 				numAnimal = 4;
 				newSpeed = baseSpeed * (1.0 + 0.04 * static_cast<float>(difficulty));
-				roadVector.push_back(new ForestRiver(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				roadVector.push_back(new ForestRiver(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight,player));
 				roadPosVector.push_back(make_pair(i * roadHeight, i * roadHeight + roadHeight));
 				isLastRoadSafe = false;
 				isLastRoadRiver = true;
@@ -239,7 +239,7 @@ void EndlessLevelGenerator::generateNewRoad() {
 			case 5:
 				numAnimal = 4;
 				newSpeed = baseSpeed * (1.0 + 0.04 * static_cast<float>(difficulty));
-				roadVector.insert(roadVector.begin(), new ForestRiver(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight));
+				roadVector.insert(roadVector.begin(), new ForestRiver(numAnimal, newSpeed, i * roadHeight, i * roadHeight + roadHeight,player));
 				roadPosVector.insert(roadPosVector.begin(), { topRoadPos.first - roadHeight,topRoadPos.second - roadHeight });
 				isLastRoadSafe = false;
 				isLastRoadRiver = true;

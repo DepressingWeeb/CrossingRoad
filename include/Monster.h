@@ -5,6 +5,7 @@
 #include <vector>
 #include "ResourceManager.h"
 #include "Character.h"
+#include "global.h"
 #include <random>
 #include <chrono>
 enum class ArrowType {
@@ -25,7 +26,7 @@ private:
     float x;
     float y;
     int xDest;
-    int YDest;
+    int yDest;
     int width;
     int height;
     int arrowSpeed;
@@ -42,8 +43,9 @@ private:
     int frameCounter_;
     float timeFadeOut;
     LTimer stepTimer;
+    SDL_Renderer* renderer;
 public:
-    NormalArrow(float x, float y, int width, int height, int xDest,int yDest,int arrowSpeed = 2000,float timeFadeOut=1.5f,ArrowType arrowType=ArrowType::ENTANGLE);
+    NormalArrow(SDL_Renderer* renderer,float x, float y, int width, int height, int xDest,int yDest,int arrowSpeed = 2000,float timeFadeOut=1.5f,ArrowType arrowType=ArrowType::ENTANGLE);
     bool Update();
     void Draw() ;
     int getYCoordinate();
@@ -57,7 +59,7 @@ private:
     float x;
     float y;
     int xDest;
-    int YDest;
+    int yDest;
     int width;
     int height;
     int arrowSpeed;
@@ -73,8 +75,9 @@ private:
     int frameCounter_;
     float timeFadeOut;
     LTimer stepTimer;
+    SDL_Renderer* renderer;
 public:
-    ShowerArrow(float x, float y, int width, int height, int xDest, int yDest, int arrowSpeed = 2000, float timeFadeOut = 1.5f, ArrowType arrowType = ArrowType::ENTANGLE);
+    ShowerArrow(SDL_Renderer* renderer, float x, float y, int width, int height, int xDest, int yDest, int arrowSpeed = 2000, float timeFadeOut = 1.5f);
     bool Update();
     void Draw();
     int getYCoordinate();
@@ -83,6 +86,34 @@ public:
     SDL_Rect boundingRect();
 };
 
+class Beam :public Arrow {
+private:
+    float x;
+    float y;
+    int width;
+    int height;
+    bool done;
+    enum class ArrowState {
+        START = 0,
+        ANIMATING
+    } arrowState;
+    vector<LTexture*> animatingArrow;
+    int numFrames_;
+    int frameDuration_;
+    int currentFrame_;
+    int frameCounter_;
+    float timeFadeOut;
+    LTimer stepTimer;
+    SDL_Renderer* renderer;
+public:
+    Beam(SDL_Renderer* renderer, float x, float y, int width, int height,int frameDurations);
+    bool Update();
+    void Draw();
+    int getYCoordinate();
+    void setYCoordinate(float y);
+    void startMoving();
+    SDL_Rect boundingRect();
+};
 
 class Monster {
 private:

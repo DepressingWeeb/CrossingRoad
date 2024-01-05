@@ -645,6 +645,12 @@ void MonsterRoad::Draw() {
 	for (StaticAnimatingObject* obj : decoratorObj)
 		obj->Draw();
 	archer->Draw();
+	vector<SDL_Rect> debugDangerRect = getDangerousRoadObjBoundRect();
+	//SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(gRenderer, 200, 0, 0, 100);
+	for (SDL_Rect dangerRect : debugDangerRect) {
+		SDL_RenderFillRect(gRenderer, &dangerRect);
+	}
 }
 
 void MonsterRoad::Update() {
@@ -666,7 +672,12 @@ vector<SDL_Rect> MonsterRoad::getSafeRoadObjBoundRect() {
 }
 
 vector<SDL_Rect> MonsterRoad::getDangerousRoadObjBoundRect() {
-	return vector<SDL_Rect>();
+	vector<SDL_Rect> ans;
+	ans.push_back(archer->boundingRect());
+	vector<SDL_Rect> arrowBoundRects = archer->arrowBoundingRect();
+	for (SDL_Rect rect : arrowBoundRects)
+		ans.push_back(rect);
+	return ans;
 }
 
 RollingStoneRoad::RollingStoneRoad(int nStone, int speed, int startY, int endY) {
@@ -680,7 +691,7 @@ RollingStoneRoad::RollingStoneRoad(int nStone, int speed, int startY, int endY) 
 
 	//Two offset variable 
 	int offsetY1 = 0;//the upper lane
-	int offsetY2 = (endY - startY) / 3 + (endY - startY) / 12;//The lower lane
+	int offsetY2 = (endY - startY) / 3 ;//The lower lane
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
@@ -710,7 +721,7 @@ RollingStoneRoad::RollingStoneRoad(int nStone, int speed, int startY, int endY) 
 				break;
 
 		}
-		AnimatingObject* newStone = new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY1, -1, -1, 1, scalingFactor);
+		AnimatingObject* newStone = new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY1, -1, -1, speed, scalingFactor);
 		roadObj.push_back(make_pair(newStone, 0));
 		occupiedPixels.push_back(stoneOccupyPixels);
 	}
@@ -729,7 +740,7 @@ RollingStoneRoad::RollingStoneRoad(int nStone, int speed, int startY, int endY) 
 			if (!isOccupied)
 				break;
 		}
-		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY2, -1, -1, -1, 0.25), 1));
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, stoneTexture, stoneTexture.size(), 10, stoneOccupyPixels.x, startY + offsetY2, -1, -1, -speed, 0.25), 1));
 		occupiedPixels.push_back(stoneOccupyPixels);
 	}
 }
@@ -756,8 +767,8 @@ void RollingStoneRoad::setStartEndPosRoad(int newStartY, int newEndY) {
 	this->startY = newStartY;
 	this->endY = newEndY;
 	//In case there are changes in startY and endY, due to the level moving in endless mode,then update each vehicle's Y coordinate
-	int offsetY1 = (endY - startY) / 5;//the upper lane
-	int offsetY2 = (endY - startY) / 2 + (endY - startY) / 12;//The lower lane
+	int offsetY1 = 0;//the upper lane
+	int offsetY2 = (endY - startY) / 3;//The lower lane
 	for (pair<AnimatingObject*, int> obj : roadObj) {
 		if (obj.second == 0) {
 			obj.first->setYCoordinate(startY + offsetY1);
@@ -780,7 +791,7 @@ vector<SDL_Rect> RollingStoneRoad::getSafeRoadObjBoundRect() {
 	return vector<SDL_Rect>();
 }
 
-ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
+ForestRiver::ForestRiver(int n, int speed, int startY, int endY,Character* player) {
 	//Get resource manager instance
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
 	this->roadTexture = resourceManager.GetTexture(ResourceType::SimpleSafeRoad)[0];
@@ -788,7 +799,7 @@ ForestRiver::ForestRiver(int n, int speed, int startY, int endY) {
 	this->speed = speed;
 	this->startY = startY;
 	this->endY = endY;
-
+	this->player = player;
 	int offsetY = (endY - startY) / 2;//The lower lane
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
@@ -877,16 +888,17 @@ void ForestRiver::setStartEndPosRoad(int newStartY, int newEndY) {
 
 vector<SDL_Rect> ForestRiver::getDangerousRoadObjBoundRect() {
 	vector<SDL_Rect> ans;
+	const int offset = 10;
 	vector<SDL_Rect> timberBoundRectsUpperLane;
 	vector<SDL_Rect> timberBoundRectsLowerLane;
 	//Get the timber bound rect for 2 lane
 	for (auto timber : roadObj) {
 		SDL_Rect boundRect = timber.first->boundingRect();
 		//undo the offset
-		boundRect.x -= 10;
-		boundRect.y -= 10;
-		boundRect.w += 20;
-		boundRect.h += 20;
+		boundRect.x -= 20;
+		boundRect.y -= 20;
+		boundRect.w += 40;
+		boundRect.h += 40;
 		if (timber.second == 0)
 			timberBoundRectsUpperLane.push_back(boundRect);
 		else
@@ -902,34 +914,34 @@ vector<SDL_Rect> ForestRiver::getDangerousRoadObjBoundRect() {
 		SDL_Rect prev = timberBoundRectsUpperLane[i - 1];
 		SDL_Rect curr = timberBoundRectsUpperLane[i];
 		//danger rect is between the gap of the 2 rect
-		SDL_Rect dangerRect = { prev.x + prev.w,prev.y,curr.x - (prev.x + prev.w),curr.h };
+		SDL_Rect dangerRect = { prev.x + prev.w,startY+offset*2,curr.x - (prev.x + prev.w),(endY-startY)/2-offset*2 };
 		ans.push_back(dangerRect);
 	}
 	//add the gap between the first and last timber if exist
 	SDL_Rect first = timberBoundRectsUpperLane[0];
 	SDL_Rect last = timberBoundRectsUpperLane[timberBoundRectsUpperLane.size() - 1];
 	if (first.x > 0) {
-		ans.push_back({ 0,first.y,first.x,first.h });
+		ans.push_back({ 0,startY+offset * 2,first.x,(endY - startY) / 2 - offset * 2 });
 	}
 	if (last.x + last.w < SCREEN_WIDTH) {
-		ans.push_back({ last.x + last.w ,last.y,SCREEN_WIDTH - (last.x + last.w),last.h });
+		ans.push_back({ last.x + last.w ,startY+offset * 2,SCREEN_WIDTH - (last.x + last.w),(endY - startY) / 2 - offset * 2 });
 	}
 
 	for (int i = 1; i < timberBoundRectsLowerLane.size(); i++) {
 		SDL_Rect prev = timberBoundRectsLowerLane[i - 1];
 		SDL_Rect curr = timberBoundRectsLowerLane[i];
 		//danger rect is between the gap of the 2 rect
-		SDL_Rect dangerRect = { prev.x + prev.w,prev.y,curr.x - (prev.x + prev.w),curr.h };
+		SDL_Rect dangerRect = { prev.x + prev.w,startY+ (endY - startY) / 2+offset,curr.x - (prev.x + prev.w),(endY - startY) / 2-offset*2 };
 		ans.push_back(dangerRect);
 	}
 	//add the gap between the first and last timber if exist
 	first = timberBoundRectsLowerLane[0];
 	last = timberBoundRectsLowerLane[timberBoundRectsLowerLane.size() - 1];
 	if (first.x > 0) {
-		ans.push_back({ 0,first.y,first.x,first.h });
+		ans.push_back({ 0,startY+ (endY - startY) / 2 + offset,first.x,(endY - startY) / 2 - offset * 2 });
 	}
 	if (last.x + last.w < SCREEN_WIDTH) {
-		ans.push_back({ last.x + last.w ,last.y,SCREEN_WIDTH - (last.x + last.w),last.h });
+		ans.push_back({ last.x + last.w ,startY+ (endY - startY) / 2 + offset,SCREEN_WIDTH - (last.x + last.w),(endY - startY) / 2 - offset * 2 });
 	}
 	return ans;
 }
@@ -946,8 +958,24 @@ vector<SDL_Rect> ForestRiver::getSafeRoadObjBoundRect() {
 }
 
 void ForestRiver::Update() {
+	
 	for (pair<AnimatingObject*, int> obj : roadObj) {
 		obj.first->Update();
+	}
+	SDL_Rect playerRect = player->getBoundingRect();
+	pair<float, float> coord = player->getCoordinate();
+	float timeStep = stepTimer.getTicks() / 1000.f;
+	stepTimer.start();
+
+	if (playerRect.y + playerRect.h > startY && playerRect.y + playerRect.h < startY + (endY - startY) / 2) {
+
+		float deltaX = speed * timeStep;
+		player->setXCoordinate(coord.first + deltaX);
+	}
+	else if (playerRect.y + playerRect.h > startY + (endY - startY) / 2 && playerRect.y + playerRect.h < endY) {
+
+		float deltaX = -speed * timeStep;
+		player->setXCoordinate(coord.first + deltaX);
 	}
 	for (int i = 0; i < waters.size(); i++) {
 		waters[i].first->Update();
@@ -970,5 +998,6 @@ void ForestRiver::Draw() {
 	for (SDL_Rect dangerRect : debugDangerRect) {
 		SDL_RenderFillRect(gRenderer, &dangerRect);
 	}
+	
 }
 

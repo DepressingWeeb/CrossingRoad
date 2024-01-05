@@ -34,6 +34,8 @@ public:
 	//void updateAll();
 	void Draw();
 	SDL_Rect getBoundingRect();
-	void setCoordinate(int x, int y);
+	pair<float, float> getCoordinate();
+	void setCoordinate(float x, float y);
+	void setXCoordinate(float x);
 	void setLevelSpeed(float newSpeed);
 };
