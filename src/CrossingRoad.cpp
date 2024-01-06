@@ -82,6 +82,7 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::Vendor_2, 4, "../../../resources/Decorator/vendor/vendor2/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Danger_1, 1, "../../../resources/Road/ConstructionSite/danger/danger1/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Danger_2, 1, "../../../resources/Road/ConstructionSite/danger/danger2/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::cloud, 3, "../../../resources/Decorator/cloud/");
 	//animal
 	resourceManager.LoadTexture(gRenderer, ResourceType::Cat, 8, "../../../resources/animal/cat/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Fox, 8, "../../../resources/animal/fox/");

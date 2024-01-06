@@ -20,6 +20,9 @@ private:
 	std::mt19937_64 generator;//random engine
 	std::uniform_int_distribution<int> distribution;
 	int terrainID;
+	LTexture* cloud;
+	vector<StaticAnimatingObject*> cloudObj;
+	bool hasCloud = false;
 	void generateNewLevel();
 public:
 	RandomLevelGenerator(int difficulty,int roadHeight,Character* player,int terrainID=0,float baseSpeed=50.f);

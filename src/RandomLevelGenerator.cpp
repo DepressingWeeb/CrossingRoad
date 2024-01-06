@@ -33,6 +33,21 @@ void RandomLevelGenerator::generateNewLevel() {
 	int nRoad = SCREEN_HEIGHT / roadHeight; //total number of roads
 	bool isLastRoadSafe = false;
 	bool isLastRoadRiver = false;
+	cloudObj.clear();
+	if (distribution(generator) % 2 == 0) {
+		hasCloud = true;
+		ResourceManager& resourceManager = ResourceManager::GetInstance();
+		this->cloud = resourceManager.GetTexture(ResourceType::cloud)[0];
+		SDL_Rect cloudOccupyPixels;
+		int scalingFactor = 2;
+		cloudOccupyPixels = { distribution(generator) % SCREEN_WIDTH - this->cloud->getWidth(), distribution(generator) % SCREEN_HEIGHT - this->cloud->getHeight() * scalingFactor, static_cast<int>(this->cloud->getWidth() * scalingFactor),static_cast<int>(this->cloud->getHeight() * scalingFactor) };
+		StaticAnimatingObject* newCloud = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(ResourceType::cloud), 3, 20, cloudOccupyPixels.x, cloudOccupyPixels.y, -1, -1, scalingFactor);
+		cloudObj.push_back(newCloud);
+	}
+	else {
+		hasCloud = false;
+	}
+
 	for (int i = 0; i < nRoad; i++) {
 
 		int randomInt = distribution(generator);
@@ -130,7 +145,7 @@ void RandomLevelGenerator::generateNewLevel() {
 		roadVector.push_back(new SimpleSafeRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
 	else
 		roadVector.push_back(new SafeForestRoad(roadVector.size() * roadHeight, SCREEN_HEIGHT));
-	cout <<"Road vcetor size: " << roadVector.size() << endl;
+	cout <<"Road vector size: " << roadVector.size() << endl;
 }
 
 int RandomLevelGenerator::getScore() {
@@ -139,6 +154,12 @@ int RandomLevelGenerator::getScore() {
 
 bool RandomLevelGenerator::Update() {
 	SDL_Rect playerRect = player->getBoundingRect();
+	
+	if (hasCloud) {
+		for (int i = 0; i < cloudObj.size(); i++) {
+			cloudObj[i]->Update();
+		}
+	}
 	//if the player touch the upper bound of the screen,generate new level and reset the player's coordinate and update scoring
 	if (playerRect.y <= 0) {
 		player->setCoordinate(SCREEN_WIDTH / 2, SCREEN_HEIGHT - playerRect.h - 10);
@@ -189,4 +210,10 @@ void RandomLevelGenerator::Draw() {
 	player->Draw();
 	//render score
 	scoreTexture->render(SCREEN_WIDTH/2, 10, NULL, -1, -1);
+
+	if (hasCloud) {
+		for (auto p : cloudObj) {
+			p->Draw();
+		}
+	}
 }

@@ -28,6 +28,7 @@ enum class ResourceType {
     LowerWaterLane,
     Railway,
     ConstructionSite,
+    cloud,
     Cat, Chicken, Fox, Cow, Wolf, Boar,
     AnimalRoad,
     Tree,

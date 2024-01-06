@@ -142,7 +142,7 @@ SimpleSafeRoad::SimpleSafeRoad(int startY, int endY) {
 	int maxNumber = INT_MAX;
 	// Define the distribution and generate the random number
 	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
-	std::uniform_int_distribution<int> randomVendor(3, 4);
+	std::uniform_int_distribution<int> randomVendor(2, 3);
 	int randomValue = randomVendor(generator);
 	double scalingFactor = 0.5;
 	vector<SDL_Rect> occupiedPixels;
@@ -199,6 +199,7 @@ int SimpleSafeRoad::getRoadID() {
 void SimpleSafeRoad::setStartEndPosRoad(int newStartY, int newEndY) {
 	this->startY = newStartY;
 	this->endY = newEndY;
+	for (auto obj : vendorObj) obj->setYCoordinate(newStartY);
 }
 
 vector<SDL_Rect> SimpleSafeRoad::getDangerousRoadObjBoundRect() {
@@ -389,7 +390,7 @@ ConstructionSite::ConstructionSite(int startY, int endY) {
 	int maxNumber = INT_MAX;
 	// Define the distribution and generate the random number
 	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
-	std::uniform_int_distribution<int> random(3, 6);
+	std::uniform_int_distribution<int> random(3, 4);
 	int randomValue = random(generator);
 	double scalingFactor = 1;
 	vector<SDL_Rect> occupiedPixels;
@@ -448,6 +449,7 @@ void ConstructionSite::Draw() {
 void ConstructionSite::setStartEndPosRoad(int newStartY, int newEndY) {
 	this->startY = newStartY;
 	this->endY = newEndY;
+	for (auto obj : dangerObj) obj->setYCoordinate(newStartY);
 }
 
 int ConstructionSite::getRoadID() {
