@@ -303,18 +303,19 @@ void Monster::Update() {
         }
     }
     else {
-        //x:400 to 1500
+        //x:400 to 1300
         if (!startedAttack) {
             //append arrow to arrowVector
             if (monsterState == MonsterState::ATTACK_1) {
+                //y:0 to 50
                 arrowVector.push_back(new NormalArrow(renderer,x + 50, y, 256, 128, 400, y, arrowSpeed, timeArrowAppear, ArrowType::POISON));
                 arrowVector.push_back(new NormalArrow(renderer,x + 50, y + 30, 256, 128, 900, y + 30, arrowSpeed, timeArrowAppear));
                 arrowVector.push_back(new NormalArrow(renderer,x + 50, y + 60, 256, 128, 1300, y + 60, arrowSpeed, timeArrowAppear));
             }
             else if(monsterState==MonsterState::ATTACK_2) {
                 arrowVector.push_back(new ShowerArrow(renderer,x + 50, y, 256, 128, 400, y, arrowSpeed, timeArrowAppear));
-                arrowVector.push_back(new ShowerArrow(renderer,x + 50, y + 30, 256, 128, 900, y + 30, arrowSpeed, timeArrowAppear));
-                arrowVector.push_back(new ShowerArrow(renderer,x + 50, y + 60, 256, 128, 1300, y + 60, arrowSpeed, timeArrowAppear));
+                arrowVector.push_back(new ShowerArrow(renderer,x + 50, y + 20, 256, 128, 900, y + 20, arrowSpeed, timeArrowAppear));
+                arrowVector.push_back(new ShowerArrow(renderer,x + 50, y + 40, 256, 128, 1300, y + 40, arrowSpeed, timeArrowAppear));
                 
             }
             else {

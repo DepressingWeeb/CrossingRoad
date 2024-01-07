@@ -25,6 +25,7 @@ enum class ResourceType {
     Archer_ARROW_EFFECT_SPECIAL,
     Archer_ARROW_EFFECT_SHOWER,
     SimpleRoad,
+    ConstructionSite,
     SimpleSafeRoad,
     UpperWaterLane,
     LowerWaterLane,
@@ -39,7 +40,22 @@ enum class ResourceType {
     MonsterRoad,
     RollingStoneRoad,
     Stone,
-    Timber
+    Timber,
+    Vendor_1,
+    Vendor_2,
+    Danger_1,
+    Danger_2,
+    Cloud
+};
+
+const vector<ResourceType> vendorResources = {
+    ResourceType::Vendor_1,
+    ResourceType::Vendor_2
+};
+
+const vector<ResourceType> dangerResources = {
+    ResourceType::Danger_1,
+    ResourceType::Danger_2
 };
 
 const vector<ResourceType> vehicleResources = {

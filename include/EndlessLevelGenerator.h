@@ -1,9 +1,10 @@
 #pragma once
 #include "road.h"
 #include "Character.h"
+#include "LevelGenerator.h"
 #include <chrono>
 #include <random>
-class EndlessLevelGenerator {
+class EndlessLevelGenerator:public LevelGenerator {
 private:
 	vector<Road*> roadVector; 
 	vector<pair<int,int>> roadPosVector;//contains the y-pos of road based on level upper pos y 
@@ -12,6 +13,8 @@ private:
 	LTexture* scoreTexture;//for render score to screen
 	int roadHeight;
 	int difficulty;//difficulty,increase by 1 for each dangerous road
+	int lastScore;
+	int currScore;
 	int totalScore;//totalScore=lastLevelScore+currScore
 	//number of vehicle each road = sqrt(diff/(SCREEN_WIDTH/roadHeight)+1)*2
 	float baseSpeed;//speed of vehicle
@@ -25,10 +28,10 @@ private:
 	void generateNewRoad();
 public:
 	EndlessLevelGenerator(int difficulty, int roadHeight, Character* player,int terrainID=0,float baseSpeed=50.f,float levelSpeed=20.f);
+	EndlessLevelGenerator(Character* player,std::ifstream& in);
 	~EndlessLevelGenerator();
-	int getScore();
-	bool Update();
-	void Draw();
-	void ToFile();
-	void FromFile();
+	int getScore() override;
+	bool Update() override;
+	void Draw() override;
+	void ToFile(std::ostream& out) override;
 };

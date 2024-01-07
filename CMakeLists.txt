@@ -62,7 +62,7 @@ set(IMGUI_DIR
 )
 
 # Add source to this project's executab "src/ResourceManager.cpp"le.
-add_executable (CrossingRoad ${SOURCES} "include/road.h" "src/road.cpp" "include/RandomLevelGenerator.h" "src/RandomLevelGenerator.cpp" "include/Button.h" "src/Button.cpp" "include/Timer.h" "src/Timer.cpp" "include/Vehicle.h" "src/Vehicle.cpp" "include/EndlessLevelGenerator.h" "src/EndlessLevelGenerator.cpp" "src/StaticAnimatingObject.cpp" "include/Monster.h" "src/Monster.cpp" "include/Animal.h" "src/Animal.cpp")
+add_executable (CrossingRoad ${SOURCES} "include/road.h" "src/road.cpp" "include/RandomLevelGenerator.h" "src/RandomLevelGenerator.cpp" "include/Button.h" "src/Button.cpp" "include/Timer.h" "src/Timer.cpp" "include/Vehicle.h" "src/Vehicle.cpp" "include/EndlessLevelGenerator.h" "src/EndlessLevelGenerator.cpp" "src/StaticAnimatingObject.cpp" "include/Monster.h" "src/Monster.cpp" "include/Animal.h" "src/Animal.cpp" "include/ParallaxBackground.h" "src/ParallaxBackground.cpp" "include/LevelGenerator.h" "src/LevelGenerator.cpp")
 target_include_directories(CrossingRoad
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/vclib/SDL2::SDL2

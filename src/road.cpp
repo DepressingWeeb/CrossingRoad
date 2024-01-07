@@ -84,7 +84,10 @@ void SimpleRoad::Update() {
 	}
 }
 void SimpleRoad::Draw() {
-	roadTexture->render(0, startY, NULL, SCREEN_WIDTH, endY - startY);
+	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
+	for (int i = 0; i < nRoadRender; i++) {
+		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
 	for (auto obj : roadObj) {
 		obj.first->Draw();
 	}
@@ -127,16 +130,67 @@ SimpleSafeRoad::SimpleSafeRoad(int startY, int endY) {
 	this->roadTexture = resourceManager.GetTexture(ResourceType::SimpleSafeRoad)[0];
 	this->startY = startY;
 	this->endY = endY;
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
+
+	// Seed the random number generator with nanoseconds
+	std::mt19937_64 generator(nanoseconds);
+
+	// Define the range for the random number
+	int minNumber = 0;
+	int maxNumber = INT_MAX;
+	// Define the distribution and generate the random number
+	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
+	std::uniform_int_distribution<int> randomVendor(2, 3);
+	int randomValue = randomVendor(generator);
+	double scalingFactor = 0.5;
+	LTexture* vendor;
+	vector<SDL_Rect> occupiedPixels;
+	for (int i = 0; i < randomValue; i++) {
+		int randomInt = distribution(generator);
+		ResourceType randomVendor = vendorResources[(randomInt % vendorResources.size())];
+		vendor = resourceManager.GetTexture(randomVendor)[0];
+		SDL_Rect vendorOccupyPixels;
+		while (true) {
+			int randomX;
+			if (distribution(generator) % 2 == 0) {
+				// Random x-coordinate in the range [0, 200]
+				randomX = distribution(generator) % 201;
+			}
+			else {
+				// Random x-coordinate in the range [400, 1200]
+				randomX = 400 + distribution(generator) % 801;
+			}
+			vendorOccupyPixels = { randomX ,startY ,static_cast<int>(vendor->getWidth() * scalingFactor),static_cast<int>(vendor->getHeight() * scalingFactor) };
+			bool isOccupied = false;
+			for (SDL_Rect occupied : occupiedPixels) {
+				if (SDL_HasIntersection(&occupied, &vendorOccupyPixels))
+					isOccupied = true;
+			}
+			if (!isOccupied)
+				break;
+		}
+		StaticAnimatingObject* newVendor = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(randomVendor), 4, 10, vendorOccupyPixels.x, vendorOccupyPixels.y, -1, -1, scalingFactor);
+		vendorObj.push_back(newVendor);
+		occupiedPixels.push_back(vendorOccupyPixels);
+	}
 }
 
+
 void SimpleSafeRoad::Update() {
-	return;
+	for (int i = 0; i < vendorObj.size(); i++) {
+		vendorObj[i]->Update();
+
+	}
 }
 
 void SimpleSafeRoad::Draw() {
 	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
 	for (int i = 0; i < nRoadRender; i++) {
 		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
+	for (auto p : vendorObj) {
+		p->Draw();
 	}
 }
 
@@ -147,6 +201,8 @@ int SimpleSafeRoad::getRoadID() {
 void SimpleSafeRoad::setStartEndPosRoad(int newStartY, int newEndY) {
 	this->startY = newStartY;
 	this->endY = newEndY;
+	for (auto obj : vendorObj) 
+		obj->setYCoordinate(newStartY);
 }
 
 vector<SDL_Rect> SimpleSafeRoad::getDangerousRoadObjBoundRect() {
@@ -154,7 +210,16 @@ vector<SDL_Rect> SimpleSafeRoad::getDangerousRoadObjBoundRect() {
 }
 
 vector<SDL_Rect> SimpleSafeRoad::getSafeRoadObjBoundRect() {
-	return vector<SDL_Rect>();
+	vector<SDL_Rect> ans;
+	for (auto obj : vendorObj) {
+		SDL_Rect rect;
+		rect.x = obj->boundingRect().x + obj->boundingRect().w / 4;
+		rect.y = obj->boundingRect().y + obj->boundingRect().h / 4;
+		rect.w = obj->boundingRect().w - obj->boundingRect().w / 2;
+		rect.h = obj->boundingRect().h - obj->boundingRect().h / 3;
+		ans.push_back(rect);
+	}
+	return ans;
 }
 
 Railway::Railway(int speed, float timeTrafficLightRed, float timeTrafficLightGreen, int startY, int endY) {
@@ -308,6 +373,95 @@ void River::setStartEndPosRoad(int newStartY, int newEndY) {
 int River::getRoadID() {
 	return static_cast<int>(CityRoadType::River);
 }
+
+
+ConstructionSite::ConstructionSite(int startY, int endY) {
+	ResourceManager& resourceManager = ResourceManager::GetInstance();
+	this->roadTexture = resourceManager.GetTexture(ResourceType::ConstructionSite)[0];
+	this->startY = startY;
+	this->endY = endY;
+
+	int offset = (endY - startY) / 8;
+	// Get the current time in nanoseconds
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
+
+	// Seed the random number generator with nanoseconds
+	std::mt19937_64 generator(nanoseconds);
+
+	// Define the range for the random number
+	int minNumber = 0;
+	int maxNumber = INT_MAX;
+	// Define the distribution and generate the random number
+	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
+	std::uniform_int_distribution<int> random(3, 6);
+	int randomValue = random(generator);
+	double scalingFactor = 1;
+	vector<SDL_Rect> occupiedPixels;
+	for (int i = 0; i < randomValue; i++) {
+		int randomInt = distribution(generator);
+		ResourceType randomDanger = dangerResources[(randomInt % dangerResources.size())];
+		this->danger = resourceManager.GetTexture(randomDanger)[0];
+		SDL_Rect dangerOccupyPixels;
+		while (true) {
+			dangerOccupyPixels = { distribution(generator) % SCREEN_WIDTH ,startY + offset ,static_cast<int>(this->danger->getWidth() * scalingFactor),static_cast<int>(this->danger->getHeight() * scalingFactor) };
+			bool isOccupied = false;
+			for (SDL_Rect occupied : occupiedPixels) {
+				if (SDL_HasIntersection(&occupied, &dangerOccupyPixels))
+					isOccupied = true;
+			}
+			if (!isOccupied)
+				break;
+		}
+		StaticAnimatingObject* newDanger = new StaticAnimatingObject(gRenderer, resourceManager.GetTexture(randomDanger), 1, 10, dangerOccupyPixels.x, dangerOccupyPixels.y, -1, -1, scalingFactor);
+		dangerObj.push_back(newDanger);
+		occupiedPixels.push_back(dangerOccupyPixels);
+	};
+}
+
+void ConstructionSite::Update() {
+	return;
+}
+
+vector<SDL_Rect> ConstructionSite::getDangerousRoadObjBoundRect() {
+	return vector<SDL_Rect>();
+}
+
+vector<SDL_Rect> ConstructionSite::getSafeRoadObjBoundRect() {
+	vector<SDL_Rect> ans;
+	for (auto obj : dangerObj) {
+		SDL_Rect rect;
+		rect.x = obj->boundingRect().x + obj->boundingRect().w / 4;
+		rect.y = obj->boundingRect().y + obj->boundingRect().h / 4;
+		rect.w = obj->boundingRect().w - obj->boundingRect().w / 2;
+		rect.h = obj->boundingRect().h - obj->boundingRect().h / 3;
+		ans.push_back(rect);
+	}
+	return ans;
+}
+
+void ConstructionSite::Draw() {
+	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
+	for (int i = 0; i < nRoadRender; i++) {
+		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
+	for (auto p : dangerObj) {
+		p->Draw();
+	}
+}
+
+void ConstructionSite::setStartEndPosRoad(int newStartY, int newEndY) {
+	this->startY = newStartY;
+	this->endY = newEndY;
+	for (StaticAnimatingObject* obj : dangerObj) {
+		obj->setYCoordinate(newStartY);
+	}
+}
+
+int ConstructionSite::getRoadID() {
+	return static_cast<int>(CityRoadType::ConstructionSite);
+}
+
 
 //==============================================SafeForestRoad================================
 SafeForestRoad::SafeForestRoad(int startY, int endY) {
@@ -507,7 +661,7 @@ vector<SDL_Rect> AnimalRoad::getSafeRoadObjBoundRect() {
 //==============================Tree Road==============================
 TreeRoad::TreeRoad(int startY, int endY) {
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
-	this->bg = resourceManager.GetTexture(ResourceType::SafeForestRoad)[0];
+	this->roadTexture = resourceManager.GetTexture(ResourceType::SafeForestRoad)[0];
 	this->startY = startY;
 	this->endY = endY;
 	// Get the current time in nanoseconds
@@ -573,7 +727,10 @@ vector<SDL_Rect> TreeRoad::getSafeRoadObjBoundRect() {
 }
 
 void TreeRoad::Draw() {
-	bg->render(0, startY, NULL, SCREEN_WIDTH, endY-startY);
+	int nRoadRender = ceil(SCREEN_WIDTH / static_cast<float>(roadTexture->getWidth()));
+	for (int i = 0; i < nRoadRender; i++) {
+		roadTexture->render(roadTexture->getWidth() * i, startY, NULL, roadTexture->getWidth(), endY - startY);
+	}
 	for (auto p : treeObj) {
 		p->Draw();
 	}
@@ -647,10 +804,12 @@ void MonsterRoad::Draw() {
 	archer->Draw();
 	vector<SDL_Rect> debugDangerRect = getDangerousRoadObjBoundRect();
 	//SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+	/*
 	SDL_SetRenderDrawColor(gRenderer, 200, 0, 0, 100);
 	for (SDL_Rect dangerRect : debugDangerRect) {
 		SDL_RenderFillRect(gRenderer, &dangerRect);
 	}
+	*/
 }
 
 void MonsterRoad::Update() {
@@ -993,11 +1152,13 @@ void ForestRiver::Draw() {
 	for (auto obj : roadObj) {
 		obj.first->Draw();
 	}
+	/*
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(gRenderer, 200, 0, 0, 100);
 	for (SDL_Rect dangerRect : debugDangerRect) {
 		SDL_RenderFillRect(gRenderer, &dangerRect);
 	}
+	*/
 	
 }
 

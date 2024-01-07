@@ -13,6 +13,7 @@
 #include "imgui/imgui-knobs.h"
 #include <fstream>
 #include <tuple>
+#include "ParallaxBackground.h"
 using namespace std;
 
 
@@ -96,6 +97,11 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::Grass, 9, "../../../resources/Decorator/Grass/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Stone, 4, "../../../resources/Road/RollingStoneRoad/stone/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::Timber, 8, "../../../resources/Road/ForestRiver/timber/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Vendor_1, 4, "../../../resources/Decorator/vendor/vendor1/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Vendor_2, 4, "../../../resources/Decorator/vendor/vendor2/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Danger_1, 1, "../../../resources/Road/ConstructionSite/danger/danger1/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Danger_2, 1, "../../../resources/Road/ConstructionSite/danger/danger2/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::Cloud, 3, "../../../resources/Decorator/Cloud/");
 
 	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleRoad, 3, "../../../resources/Road/SimpleRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::SimpleSafeRoad, 1, "../../../resources/Road/SimpleSafeRoad/");
@@ -106,6 +112,7 @@ void loadResourceCity() {
 	resourceManager.LoadTexture(gRenderer, ResourceType::AnimalRoad, 1, "../../../resources/Road/AnimalRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::MonsterRoad, 1, "../../../resources/Road/MonsterRoad/");
 	resourceManager.LoadTexture(gRenderer, ResourceType::RollingStoneRoad, 1, "../../../resources/Road/RollingStoneRoad/");
+	resourceManager.LoadTexture(gRenderer, ResourceType::ConstructionSite, 1, "../../../resources/Road/ConstructionSite/road/");
 	
 
 	//temporary
@@ -135,7 +142,8 @@ void highlightRect(SDL_Rect rectHighlight) {
 
 //args[0]: level(terrain) type (0:city , 1:forest)
 //args[1]: mode (0: level mode, 1: endless mode)
-void game(const vector<int>& args) {
+void game(vector<int> args) {
+	ifstream in("save.txt");
 	SDL_Event e;
 	SDL_Rect rect;
 	ResourceManager& resourceManager = ResourceManager::GetInstance();
@@ -146,94 +154,128 @@ void game(const vector<int>& args) {
 	vector<LTexture*> collisionFrames = resourceManager.GetTexture(ResourceType::Explosion);
 	AnimatingObject* collisionEffect=nullptr;
 	int currCollisionFrame = 0;
-	Character player(gRenderer, resourceManager.GetTexture(ResourceType::Character), 4, 10, 300, 610, 32, 32, 200);
+	int lastPlayTime = 0;
+	//Character player(gRenderer, resourceManager.GetTexture(ResourceType::Character), 4, 10, 300, 610, 32, 32, 200);
+	
+	//Character player(gRenderer, resourceManager.GetTexture(ResourceType::Character), in);
+	Character* player;
+	LevelGenerator* levelGenerator;
+	if (args.size() == 3) {
+		in >> isPlaying >> currCollisionFrame >> lastPlayTime >> args[0] >> args[1];
+		player = new Character(gRenderer, resourceManager.GetTexture(ResourceType::Character), in);
+		if (args[1] == 0) {
+			levelGenerator = new RandomLevelGenerator(player,in);
+		}
+		else {
+			levelGenerator = new EndlessLevelGenerator(player,in);
+		}
+	}
+	else {
+		player = new Character(gRenderer, resourceManager.GetTexture(ResourceType::Character), 4, 10, 300, 610, 32, 32, 200);
+		if (args[1] == 0) {
+			levelGenerator = new RandomLevelGenerator(0, 100, player, args[0]);
+		}
+		else {
+			levelGenerator = new EndlessLevelGenerator(0, 100, player, args[0]);
+		}
+	}
+	
+	
 	int score;
 	Uint32 startTime = SDL_GetTicks();
 	SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
-	if (args[1] == 0) {
-		RandomLevelGenerator levelGenerator(0, 100, &player,args[0]);
-		bool quit = false;
-		while (!quit) {
-			SDL_RenderClear(gRenderer);
-			SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+	
+	bool paused = false;
+	SDL_Rect pauseButtonDestRect = { 10,10,50,50 };
+	SDL_Rect continueButtonDestRect = { SCREEN_WIDTH / 2 - 200 / 2,250,200,100 };
+	SDL_Rect saveButtonDestRect = { SCREEN_WIDTH / 2 - 200 / 2,375,200,100 };
+	SDL_Rect quitButtonDestRect = { SCREEN_WIDTH / 2 - 200 / 2,500,200,100 };
+	Button* pauseButton= new Button("../../../resources/GameScreen/Button/pauseNormal.png", "../../../resources/GameScreen/Button/pauseHover.png", pauseButtonDestRect,nullptr);
+	Button* continueButton = new Button("../../../resources/GameScreen/Button/continueNormal.png", "../../../resources/GameScreen/Button/continueHover.png", pauseButtonDestRect, nullptr);
+	Button* continueButtonB = new Button("../../../resources/GameScreen/Button/continueNormalB.png", "../../../resources/GameScreen/Button/continueHoverB.png", continueButtonDestRect, nullptr);
+	Button* saveButton = new Button("../../../resources/GameScreen/Button/saveNormal.png", "../../../resources/GameScreen/Button/saveHover.png", saveButtonDestRect, nullptr);
+	Button* quitButton = new Button("../../../resources/GameScreen/Button/quitNormal.png", "../../../resources/GameScreen/Button/quitHover.png", quitButtonDestRect, &levelScreen);
+	
+	
+	//if (args.size() == 3) {
+		//in >> isPlaying >> currCollisionFrame >> lastPlayTime >> args[0] >> args[1];
+		//player = Character(gRenderer, resourceManager.GetTexture(ResourceType::Character), in);
+
+	//}
+	in.close();
+	bool quit = false;
+	while (!quit) {
+		SDL_RenderClear(gRenderer);
+		SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+		SDL_RenderFillRect(gRenderer, &SCREEN);
+		ImGui_ImplSDLRenderer_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+		if(isPlaying && !paused)
+			isPlaying&=levelGenerator->Update();
+		levelGenerator->Draw();
+		if (paused) {
+			SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 100);
 			SDL_RenderFillRect(gRenderer, &SCREEN);
-			ImGui_ImplSDLRenderer_NewFrame();
-			ImGui_ImplSDL2_NewFrame();
-			ImGui::NewFrame();
-			if(isPlaying)
-				isPlaying&=levelGenerator.Update();
-			levelGenerator.Draw();
-			//if the player lose, then generate collision
-			if (!isPlaying) {
-				if (!collisionEffect) {
-					SDL_Rect characterRect = player.getBoundingRect();
-					collisionEffect = new NormalVehicle(gRenderer, collisionFrames, 12, 5, characterRect.x-25, characterRect.y-25, -1, -1, 0);
-				}
-				else if (currCollisionFrame >= 60) {
-					quit = true;
-					functionStack.push(VoidFunction(levelScreen));
-				}
-				collisionEffect->Update();
-				collisionEffect->Draw();
-				currCollisionFrame++;
-			}
-			if (SDL_PollEvent(&e)) {
-				ImGui_ImplSDL2_ProcessEvent(&e);
-				switch (e.type) {
-				case SDL_QUIT:
-					quit = true;
-					quitGame();
-					break;
-				}
-			}
-			ImGui::Render();
-			ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-			SDL_RenderPresent(gRenderer);
+			continueButtonB->Update();
+			continueButtonB->Draw();
+			saveButton->Update();
+			saveButton->Draw();
+			quitButton->Update(&quit);
+			quitButton->Draw();
 		}
-		score = levelGenerator.getScore();
-	}
-	else {
-		EndlessLevelGenerator levelGenerator(0, 100, &player,args[0]);
-		bool quit = false;
-		while (!quit) {
-			SDL_RenderClear(gRenderer);
-			SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-			SDL_RenderFillRect(gRenderer, &SCREEN);
-			ImGui_ImplSDLRenderer_NewFrame();
-			ImGui_ImplSDL2_NewFrame();
-			ImGui::NewFrame();
-			if (isPlaying)
-				isPlaying &= levelGenerator.Update();
-			levelGenerator.Draw();
-			if (!isPlaying) {
-				if (!collisionEffect) {
-					SDL_Rect characterRect = player.getBoundingRect();
-					collisionEffect = new NormalVehicle(gRenderer, collisionFrames, 12, 5, characterRect.x-25, characterRect.y-25, -1, -1, 0);
-				}
-				else if (currCollisionFrame >= 60) {
-					quit = true;
-					functionStack.push(VoidFunction(levelScreen));
-				}
-				collisionEffect->Update();
-				collisionEffect->Draw();
-				currCollisionFrame++;
-			}
-			if (SDL_PollEvent(&e)) {
-				ImGui_ImplSDL2_ProcessEvent(&e);
-				switch (e.type) {
-				case SDL_QUIT:
-					quit = true;
-					quitGame();
-					break;
-				}
-			}
-			ImGui::Render();
-			ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-			SDL_RenderPresent(gRenderer);
+		if (!paused) {
+			pauseButton->Update();
+			pauseButton->Draw();
 		}
-		score = levelGenerator.getScore();
+		else {
+			continueButton->Update();
+			continueButton->Draw();
+		}
+		if (!isPlaying) {
+			if (!collisionEffect) {
+				SDL_Rect characterRect = player->getBoundingRect();
+				collisionEffect = new NormalVehicle(gRenderer, collisionFrames, 12, 5, characterRect.x-25, characterRect.y-25, -1, -1, 0);
+			}
+			else if (currCollisionFrame >= 60) {
+				quit = true;
+				functionStack.push(VoidFunction(levelScreen));
+			}
+			collisionEffect->Update();
+			collisionEffect->Draw();
+			currCollisionFrame++;
+		}
+		if (SDL_PollEvent(&e)) {
+			ImGui_ImplSDL2_ProcessEvent(&e);
+			switch (e.type) {
+			case SDL_QUIT:
+				quit = true;
+				quitGame();
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				SDL_Point p = { e.button.x,e.button.y };
+				if (SDL_PointInRect(&p, &pauseButtonDestRect))
+					paused = !paused;
+				if (paused && SDL_PointInRect(&p, &continueButtonDestRect)) {
+					paused = false;
+				}
+				if (paused && SDL_PointInRect(&p, &saveButtonDestRect)) {
+					ofstream out("save.txt");
+					out << isPlaying << " " << currCollisionFrame << " " << SDL_GetTicks() - startTime << " " << args[0] << " " << args[1] << endl;
+					player->ToFile(out);
+					levelGenerator->ToFile(out);
+					out.close();
+				}
+				break;
+			}
+		}
+		ImGui::Render();
+		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+		SDL_RenderPresent(gRenderer);
 	}
-	Uint32 timeInMili = SDL_GetTicks() - startTime;
+	score = levelGenerator->getScore();
+	
+	Uint32 timeInMili = (SDL_GetTicks() - startTime)+lastPlayTime;
 	int totalSeconds = timeInMili / 1000;
 	string minutes = to_string(totalSeconds / 60);
 	string seconds = to_string(totalSeconds % 60);
@@ -846,11 +888,24 @@ void levelScreen() {
 
 
 void mainScreen() {
-	LTexture* bg = new LTexture(gRenderer, "../../../resources/MainScreen/Background/bg.png");
-	const SDL_Rect playButtonDestRect = { 413,378,312,181 };
+	//LTexture* bg = new LTexture(gRenderer, "../../../resources/MainScreen/Background/bg.png");
+	LTexture* bg_1 = new LTexture(gRenderer, "../../../resources/MainScreen/Background/1.png");
+	LTexture* bg_2 = new LTexture(gRenderer, "../../../resources/MainScreen/Background/2.png");
+	LTexture* bg_3 = new LTexture(gRenderer, "../../../resources/MainScreen/Background/3.png");
+	LTexture* bg_4 = new LTexture(gRenderer, "../../../resources/MainScreen/Background/4.png");
+	LTexture* title = new LTexture(gRenderer, "../../../resources/MainScreen/Background/title.png");
+	vector<LTexture*> v;
+	v.push_back(bg_1);
+	v.push_back(bg_2);
+	v.push_back(bg_3);
+	v.push_back(bg_4);
+	ParallaxBackground parallaxBG = ParallaxBackground(gRenderer, v);
+	const SDL_Rect playButtonDestRect = { SCREEN_WIDTH/2-200/2,378,200,100 };
+	const SDL_Rect loadButtonDestRect = { SCREEN_WIDTH / 2 - 200 / 2,510,200,100 };
 	const SDL_Rect quitButtonDestRect = { 1145,19,36,43 };
 	SDL_Rect bgRect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
 	Button* playButton = new Button("../../../resources/MainScreen/Button/playNormal.png", "../../../resources/MainScreen/Button/playHover.png",playButtonDestRect,&levelScreen);
+	Button* loadButton = new Button("../../../resources/MainScreen/Button/loadNormal.png", "../../../resources/MainScreen/Button/loadHover.png", loadButtonDestRect, &game, {0,0,true});
 	Button* quitButton = new Button("../../../resources/MainScreen/Button/quitNormal.png", "../../../resources/MainScreen/Button/quitHover.png", quitButtonDestRect, &quitGame);
 
 	//Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
@@ -869,9 +924,14 @@ void mainScreen() {
 		ImGui_ImplSDLRenderer_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
-		bg->render(bgRect.x, bgRect.y, nullptr, SCREEN_WIDTH, SCREEN_HEIGHT);
+		//bg->render(bgRect.x, bgRect.y, nullptr, SCREEN_WIDTH, SCREEN_HEIGHT);
+		parallaxBG.update(40.0f);
+		parallaxBG.render();
 		playButton->Update(&quit);
 		playButton->Draw();
+		loadButton->Update(&quit);
+		loadButton->Draw();
+		title->render(SCREEN_WIDTH / 2 - 530/2*1.5, 200, NULL, 530.0*1.5, 65.0*1.5);
 		quitButton->Update(&quit);
 		quitButton->Draw();
 		if (SDL_PollEvent(&e)) {
@@ -888,7 +948,12 @@ void mainScreen() {
 		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 		SDL_RenderPresent(gRenderer);
 	}
-	delete bg;
+	//delete bg;
+	delete bg_1;
+	delete bg_2;
+	delete bg_3;
+	delete bg_4;
+	delete title;
 	delete playButton;
 	delete quitButton;
 }

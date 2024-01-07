@@ -1,9 +1,10 @@
 #pragma once
 #include "road.h"
 #include "Character.h"
+#include "LevelGenerator.h"
 #include <chrono>
 #include <random>
-class RandomLevelGenerator {
+class RandomLevelGenerator:public LevelGenerator {
 private:
 	vector<Road*> roadVector;
 	Character* player;
@@ -20,13 +21,15 @@ private:
 	std::mt19937_64 generator;//random engine
 	std::uniform_int_distribution<int> distribution;
 	int terrainID;
+	NormalVehicle* cloudEffect;//special effect random for each level
+	bool hasCloud;
 	void generateNewLevel();
 public:
 	RandomLevelGenerator(int difficulty,int roadHeight,Character* player,int terrainID=0,float baseSpeed=50.f);
+	RandomLevelGenerator(Character* player,std::ifstream& in);
 	~RandomLevelGenerator();
-	bool Update(); //return true if update performed,0 if the character is dead
-	int getScore();
-	void Draw();
-	void ToFile();
-	void FromFile();
+	bool Update() override; //return true if update performed,0 if the character is dead
+	int getScore() override;
+	void Draw() override;
+	void ToFile(std::ostream& out) override;
 };

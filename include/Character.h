@@ -25,6 +25,7 @@ private:
 	SDL_Renderer* renderer;//Also should not be deleted
 public:
 	Character(SDL_Renderer* renderer,const vector<LTexture*>& textureFrames, int numFrames, int frameDuration, int x, int y, int width=-1, int height=-1, float speed=50,float levelSpeed=0);
+	Character(SDL_Renderer* renderer, const vector<LTexture*>& textureFrames, ifstream& in);
 	~Character();
 	bool checkDangerousCollision(const vector<SDL_Rect>& dangerousObjBoundRectVector);
 	void updateDirection();
@@ -38,4 +39,5 @@ public:
 	void setCoordinate(float x, float y);
 	void setXCoordinate(float x);
 	void setLevelSpeed(float newSpeed);
+	void ToFile(std::ostream& out);
 };

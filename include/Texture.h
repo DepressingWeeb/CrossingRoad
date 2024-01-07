@@ -3,6 +3,7 @@
 #include "SDL_image.h"
 #include "SDL_ttf.h"
 #include <string>
+#include <fstream>
 #include <iostream>
 #include <assert.h>
 using namespace std;

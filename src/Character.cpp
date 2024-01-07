@@ -164,3 +164,30 @@ void Character::setXCoordinate(float x) {
 void Character::setLevelSpeed(float newSpeed) {
     this->levelSpeed = newSpeed;
 }
+
+void Character::ToFile(std::ostream& out) {
+    out << direction << endl;
+    out << isDeath << endl;
+    out << isMoving << endl;
+    out << x << endl;
+    out << y << endl;
+    out << width << endl;
+    out << height << endl;
+    out << speed << endl;
+    out << levelSpeed << endl;
+    out << numFrames_ << endl;
+    out << frameDuration_ << endl;
+    out << currentFrame_ << endl;
+    out << frameCounter_ << endl;
+}
+
+Character::Character(SDL_Renderer* renderer, const vector<LTexture*>& textureFrames, ifstream& in) {
+    in >> direction >> isDeath >> isMoving >> x >> y >> width >> height >> speed >> levelSpeed >> numFrames_ >> frameDuration_ >> currentFrame_ >> frameCounter_;
+    frames = vector<vector<LTexture*>>(8, vector<LTexture*>(4));
+    for (int i = 0; i < textureFrames.size(); i++) {
+        frames[i / 4][i % 4] = textureFrames[i];
+    }
+    this->xChange = new float[8] {0, -speed, -speed, -speed, 0, speed, speed, speed};
+    this->yChange = new float[8] {speed, speed, 0, -speed, -speed, -speed, 0, speed};
+    this->renderer = renderer;
+}
