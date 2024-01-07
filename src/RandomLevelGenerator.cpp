@@ -24,6 +24,7 @@ RandomLevelGenerator::RandomLevelGenerator(int difficulty, int roadHeight, Chara
 
 RandomLevelGenerator::~RandomLevelGenerator() {
 	delete scoreTexture;
+	delete cloudEffect;
 	TTF_CloseFont(font);
 }
 

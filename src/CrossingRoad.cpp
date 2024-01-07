@@ -187,9 +187,9 @@ void game(vector<int> args) {
 	
 	bool paused = false;
 	SDL_Rect pauseButtonDestRect = { 10,10,50,50 };
-	SDL_Rect continueButtonDestRect = { SCREEN_WIDTH / 2 - 200 / 2,250,200,100 };
-	SDL_Rect saveButtonDestRect = { SCREEN_WIDTH / 2 - 200 / 2,375,200,100 };
-	SDL_Rect quitButtonDestRect = { SCREEN_WIDTH / 2 - 200 / 2,500,200,100 };
+	SDL_Rect continueButtonDestRect = { SCREEN_WIDTH / 2 - 200 / 2,150,200,100 };
+	SDL_Rect saveButtonDestRect = { SCREEN_WIDTH / 2 - 200 / 2,275,200,100 };
+	SDL_Rect quitButtonDestRect = { SCREEN_WIDTH / 2 - 200 / 2,400,200,100 };
 	Button* pauseButton= new Button("../../../resources/GameScreen/Button/pauseNormal.png", "../../../resources/GameScreen/Button/pauseHover.png", pauseButtonDestRect,nullptr);
 	Button* continueButton = new Button("../../../resources/GameScreen/Button/continueNormal.png", "../../../resources/GameScreen/Button/continueHover.png", pauseButtonDestRect, nullptr);
 	Button* continueButtonB = new Button("../../../resources/GameScreen/Button/continueNormalB.png", "../../../resources/GameScreen/Button/continueHoverB.png", continueButtonDestRect, nullptr);
@@ -261,7 +261,7 @@ void game(vector<int> args) {
 				}
 				if (paused && SDL_PointInRect(&p, &saveButtonDestRect)) {
 					ofstream out("save.txt");
-					out << isPlaying << " " << currCollisionFrame << " " << SDL_GetTicks() - startTime << " " << args[0] << " " << args[1] << endl;
+					out << isPlaying << " " << currCollisionFrame << " " << (SDL_GetTicks() - startTime)+lastPlayTime << " " << args[0] << " " << args[1] << endl;
 					player->ToFile(out);
 					levelGenerator->ToFile(out);
 					out.close();
@@ -283,7 +283,15 @@ void game(vector<int> args) {
 	if (seconds.size() == 1) seconds = "0" + seconds;
 	string timeFormatted= minutes + ":" + seconds;
 	saveScore(args[1] == 0 ? "L" : "E", score,timeFormatted , args[0] == 0 ? "CITY" : "FOREST");
+	
 	delete collisionEffect;
+	delete pauseButton;
+	delete continueButton;
+	delete continueButtonB;
+	delete quitButton;
+	delete saveButton;
+	delete player;
+	delete levelGenerator;
 
 }
 void leaderboardScreen() {
@@ -956,6 +964,7 @@ void mainScreen() {
 	delete title;
 	delete playButton;
 	delete quitButton;
+	delete loadButton;
 }
 
 
