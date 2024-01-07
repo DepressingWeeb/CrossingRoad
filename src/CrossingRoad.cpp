@@ -267,6 +267,10 @@ void game(vector<int> args) {
 					out.close();
 				}
 				break;
+			case SDL_KEYDOWN:
+				if (e.key.keysym.scancode == SDL_SCANCODE_P) {
+					paused = !paused;
+				}
 			}
 		}
 		ImGui::Render();
