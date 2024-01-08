@@ -35,7 +35,7 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 	
 	vector<SDL_Rect> occupiedPixels;
 
-	const float scalingFactor = 0.5;	// Default scaling factor of vehicle resources
+	const float scalingFactor = 0.4;	// Default scaling factor of vehicle resources
 	//The two loop below randomize the vehicle for each lane and check for overlapping vehicle
 	for (int i = 0; i < nVehicle/2; i++) {
 		int randomInt = distribution(generator);
