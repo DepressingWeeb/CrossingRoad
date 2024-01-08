@@ -1,26 +1,5 @@
 #include "Monster.h"
-NormalArrow::NormalArrow(SDL_Renderer* renderer, float x, float y, int width, int height, int xDest, int yDest, int arrowSpeed, float timeFadeOut,ArrowType arrowType) {
-    this->x = x;
-    this->y = y;
-    this->width = width;
-    this->height = height;
-    this->xDest = xDest;
-    this->yDest = yDest;
-    this->arrowSpeed = arrowSpeed;
-    this->timeFadeOut = timeFadeOut;
-    this->arrowState = ArrowState::START;
-    ResourceManager& resourceManager = ResourceManager::GetInstance();
-    arrow = resourceManager.GetTexture(ResourceType::Archer_ARROW)[0];
-    if(arrowType==ArrowType::ENTANGLE)
-        animatingArrow = resourceManager.GetTexture(ResourceType::Archer_ARROW_EFFECT_1);
-    else
-        animatingArrow = resourceManager.GetTexture(ResourceType::Archer_ARROW_EFFECT_2);
-    this->frameCounter_ = 0;
-    this->currentFrame_ = 0;
-    this->frameDuration_ = 4;
-    this->numFrames_ = animatingArrow.size();
-    this->renderer = renderer;
-}
+
 
 bool NormalArrow::Update() {
     float timeStep = stepTimer.getTicks() / 1000.f;
@@ -379,4 +358,27 @@ void Monster::Draw() {
     for (int i = 0; i < arrowVector.size(); i++) {
         arrowVector[i]->Draw();
     }
+}
+
+NormalArrow::NormalArrow(SDL_Renderer* renderer, float x, float y, int width, int height, int xDest, int yDest, int arrowSpeed, float timeFadeOut, ArrowType arrowType) {
+    this->x = x;
+    this->y = y;
+    this->width = width;
+    this->height = height;
+    this->xDest = xDest;
+    this->yDest = yDest;
+    this->arrowSpeed = arrowSpeed;
+    this->timeFadeOut = timeFadeOut;
+    this->arrowState = ArrowState::START;
+    ResourceManager& resourceManager = ResourceManager::GetInstance();
+    arrow = resourceManager.GetTexture(ResourceType::Archer_ARROW)[0];
+    if (arrowType == ArrowType::ENTANGLE)
+        animatingArrow = resourceManager.GetTexture(ResourceType::Archer_ARROW_EFFECT_1);
+    else
+        animatingArrow = resourceManager.GetTexture(ResourceType::Archer_ARROW_EFFECT_2);
+    this->frameCounter_ = 0;
+    this->currentFrame_ = 0;
+    this->frameDuration_ = 4;
+    this->numFrames_ = animatingArrow.size();
+    this->renderer = renderer;
 }
