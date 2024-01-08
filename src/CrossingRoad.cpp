@@ -247,13 +247,14 @@ void game(vector<int> args) {
 		}
 		if (SDL_PollEvent(&e)) {
 			ImGui_ImplSDL2_ProcessEvent(&e);
+			SDL_Point p;
 			switch (e.type) {
 			case SDL_QUIT:
 				quit = true;
 				quitGame();
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				SDL_Point p = { e.button.x,e.button.y };
+				p = { e.button.x,e.button.y };
 				if (SDL_PointInRect(&p, &pauseButtonDestRect))
 					paused = !paused;
 				if (paused && SDL_PointInRect(&p, &continueButtonDestRect)) {
