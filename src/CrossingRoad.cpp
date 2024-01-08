@@ -235,9 +235,9 @@ void game(vector<int> args) {
 		if (!isPlaying) {
 			if (!collisionEffect) {
 				SDL_Rect characterRect = player->getBoundingRect();
-				collisionEffect = new NormalVehicle(gRenderer, collisionFrames, 12, 5, characterRect.x-25, characterRect.y-25, -1, -1, 0);
+				collisionEffect = new NormalVehicle(gRenderer, collisionFrames, 12,200, characterRect.x-25, characterRect.y-25, -1, -1, 0);
 			}
-			else if (currCollisionFrame >= 60) {
+			else if (currCollisionFrame >= 1200) {
 				quit = true;
 				functionStack.push(VoidFunction(levelScreen));
 			}
