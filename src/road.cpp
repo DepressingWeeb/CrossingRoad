@@ -394,7 +394,7 @@ ConstructionSite::ConstructionSite(int startY, int endY) {
 	int maxNumber = INT_MAX;
 	// Define the distribution and generate the random number
 	std::uniform_int_distribution<int> distribution(minNumber, maxNumber);
-	std::uniform_int_distribution<int> random(3, 6);
+	std::uniform_int_distribution<int> random(3, 4);
 	int randomValue = random(generator);
 	double scalingFactor = 1;
 	vector<SDL_Rect> occupiedPixels;
