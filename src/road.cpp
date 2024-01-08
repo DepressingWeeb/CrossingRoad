@@ -29,13 +29,13 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 	this->startY = startY;
 	this->endY = endY;
 	//Two offset variable for rendering to the correct lane
-	int offsetY1 = (endY-startY)/5;//the upper lane
-	int offsetY2 = (endY-startY)/2+ (endY - startY) / 12;//The lower lane
+	int offsetY1 = (endY - startY) / 12;//the upper lane
+	int offsetY2 = (endY - startY) / 3 + (endY - startY) / 6;//The lower lane
 	//Get the resourceManager instance
 	
 	vector<SDL_Rect> occupiedPixels;
 
-	const float scalingFactor = 1;	// Default scaling factor of vehicle resources
+	const float scalingFactor = 0.5;	// Default scaling factor of vehicle resources
 	//The two loop below randomize the vehicle for each lane and check for overlapping vehicle
 	for (int i = 0; i < nVehicle/2; i++) {
 		int randomInt = distribution(generator);
@@ -72,7 +72,7 @@ SimpleRoad::SimpleRoad(int nVehicle, int speed, int startY, int endY) {
 			if (!isOccupied)
 				break;
 		}
-		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY2, -1, -1, -speed, 0.25),1));
+		roadObj.push_back(make_pair(new NormalVehicle(gRenderer, vehicleTexture, vehicleTexture.size(), 10, vehicleOccupyPixels.x, startY + offsetY2, -1, -1, -speed, scalingFactor),1));
 		occupiedPixels.push_back(vehicleOccupyPixels);
 	}
 	
@@ -101,8 +101,8 @@ void SimpleRoad::setStartEndPosRoad(int newStartY, int newEndY) {
 	this->startY = newStartY;
 	this->endY = newEndY;
 	//In case there are changes in startY and endY, due to the level moving in endless mode,then update each vehicle's Y coordinate
-	int offsetY1 = (endY - startY) / 5;//the upper lane
-	int offsetY2 = (endY - startY) / 2 + (endY - startY) / 12;//The lower lane
+	int offsetY1 = (endY - startY) / 12;//the upper lane
+	int offsetY2 = (endY - startY) / 3 + (endY - startY) / 6;//The lower lane
 	for (pair<AnimatingObject*, int> obj : roadObj) {
 		if (obj.second == 0) {
 			obj.first->setYCoordinate(startY + offsetY1);
