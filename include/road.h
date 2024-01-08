@@ -28,6 +28,7 @@ enum class ForestRoadType
 	ForestRiver,
 	Last,
 };
+
 class Road {
 public:
 	
@@ -187,25 +188,9 @@ public:
 	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
 	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
 };
-class MonsterRoad : public Road {
-private:
-	LTexture* roadTexture;
-	int startY;
-	int endY;
-	float timeIdle;
-	float timeArrow;
-	int arrowSpeed;
-	Monster* archer;
-	vector<StaticAnimatingObject*> decoratorObj;
-public:
-	MonsterRoad(float timeIdle, float timeArrow, int arrowSpeed, int startY, int endY);
-	void Update() override;
-	void Draw() override;
-	void setStartEndPosRoad(int newStartY, int newEndY) override;
-	int getRoadID() override;
-	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
-	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
-};
+
+
+
 
 class ForestRiver : public Road {
 protected:
@@ -238,6 +223,26 @@ protected:
 	vector<pair<AnimatingObject*, int>> roadObj;
 public:
 	RollingStoneRoad(int nStone, int speed, int startY, int endY);
+	void Update() override;
+	void Draw() override;
+	void setStartEndPosRoad(int newStartY, int newEndY) override;
+	int getRoadID() override;
+	vector<SDL_Rect> getDangerousRoadObjBoundRect() override;
+	vector<SDL_Rect> getSafeRoadObjBoundRect() override;
+};
+
+class MonsterRoad : public Road {
+private:
+	LTexture* roadTexture;
+	int startY;
+	int endY;
+	float timeIdle;
+	float timeArrow;
+	int arrowSpeed;
+	Monster* archer;
+	vector<StaticAnimatingObject*> decoratorObj;
+public:
+	MonsterRoad(float timeIdle, float timeArrow, int arrowSpeed, int startY, int endY);
 	void Update() override;
 	void Draw() override;
 	void setStartEndPosRoad(int newStartY, int newEndY) override;
