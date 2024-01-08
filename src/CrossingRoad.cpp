@@ -6,7 +6,7 @@
 #include "RandomLevelGenerator.h"
 #include "EndlessLevelGenerator.h"
 #include "Button.h"
-//#include <SDL_mixer.h>
+#include <SDL_mixer.h>
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl2.h"
 #include "imgui/imgui_impl_sdlrenderer.h"
@@ -279,7 +279,6 @@ void game(vector<int> args) {
 		SDL_RenderPresent(gRenderer);
 	}
 	score = levelGenerator->getScore();
-	
 	Uint32 timeInMili = (SDL_GetTicks() - startTime)+lastPlayTime;
 	int totalSeconds = timeInMili / 1000;
 	string minutes = to_string(totalSeconds / 60);
@@ -550,6 +549,7 @@ void settingScreen() {
 			cancel->Draw();
 			if (SDL_PointInRect(&currMousePos, &saveRect) && clicked) {
 				globalSetting = temporarySetting;
+				Mix_VolumeMusic(globalSetting.volume);
 			}
 			else if (SDL_PointInRect(&currMousePos, &cancelRect) && clicked) {
 				temporarySetting = globalSetting;
@@ -577,7 +577,7 @@ void settingScreen() {
 		{
 			ImGui::Begin("Volume", nullptr,ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoDecoration|ImGuiWindowFlags_NoBackground|ImGuiWindowFlags_NoBringToFrontOnFocus|ImGuiWindowFlags_NoFocusOnAppearing); 
 			if (ImGuiKnobs::KnobInt("Volume1Knob", &temporarySetting.volume, 0, 100, 1, "%d", ImGuiKnobVariant_Wiper,70,ImGuiKnobFlags_NoTitle)) {
-				
+				Mix_VolumeMusic(temporarySetting.volume);
 			}
 			ImGui::End();
 		}
@@ -979,6 +979,10 @@ void mainScreen() {
 int main(int argn, char** argv)
 {
 	init();
+	Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
+	Mix_Music* music = Mix_LoadMUS("../../../resources/Music/music.mp3");
+	Mix_PlayMusic(music, 100);
+	Mix_VolumeMusic(globalSetting.volume );
 	functionStack.push(&mainScreen);
 	while (!functionStack.empty()) {
 		VoidFunction currActiveFunction = functionStack.top();

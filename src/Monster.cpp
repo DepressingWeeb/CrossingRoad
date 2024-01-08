@@ -306,16 +306,19 @@ void Monster::Update() {
         //x:400 to 1300
         if (!startedAttack) {
             //append arrow to arrowVector
+            int rndX1 = distribution(generator)%900+400;
+            int rndX2 = distribution(generator) % 900 + 400;
+            int rndX3 = distribution(generator) % 900 + 400;
             if (monsterState == MonsterState::ATTACK_1) {
                 //y:0 to 50
-                arrowVector.push_back(new NormalArrow(renderer,x + 50, y, 256, 128, 400, y, arrowSpeed, timeArrowAppear, ArrowType::POISON));
-                arrowVector.push_back(new NormalArrow(renderer,x + 50, y + 30, 256, 128, 900, y + 30, arrowSpeed, timeArrowAppear));
-                arrowVector.push_back(new NormalArrow(renderer,x + 50, y + 60, 256, 128, 1300, y + 60, arrowSpeed, timeArrowAppear));
+                arrowVector.push_back(new NormalArrow(renderer,x + 50, y, 256, 128, rndX1, y, arrowSpeed, timeArrowAppear, ArrowType::POISON));
+                arrowVector.push_back(new NormalArrow(renderer,x + 50, y + 30, 256, 128, rndX2, y + 25, arrowSpeed, timeArrowAppear));
+                arrowVector.push_back(new NormalArrow(renderer,x + 50, y + 60, 256, 128, rndX3, y + 50, arrowSpeed, timeArrowAppear));
             }
             else if(monsterState==MonsterState::ATTACK_2) {
-                arrowVector.push_back(new ShowerArrow(renderer,x + 50, y, 256, 128, 400, y, arrowSpeed, timeArrowAppear));
-                arrowVector.push_back(new ShowerArrow(renderer,x + 50, y + 20, 256, 128, 900, y + 20, arrowSpeed, timeArrowAppear));
-                arrowVector.push_back(new ShowerArrow(renderer,x + 50, y + 40, 256, 128, 1300, y + 40, arrowSpeed, timeArrowAppear));
+                arrowVector.push_back(new ShowerArrow(renderer,x + 50, y, 256, 128, rndX1, y-15, arrowSpeed, timeArrowAppear));
+                arrowVector.push_back(new ShowerArrow(renderer,x + 50, y + 20, 256, 128, rndX2, y + 10, arrowSpeed, timeArrowAppear));
+                arrowVector.push_back(new ShowerArrow(renderer,x + 50, y + 40, 256, 128, rndX3, y + 35, arrowSpeed, timeArrowAppear));
                 
             }
             else {
@@ -338,7 +341,6 @@ void Monster::Update() {
             startedAttack = false;
             timeSinceLastChange = 0;
             arrowVector.clear();
-            cout << "Curr frame : " << currentFrame_ <<" "<<(monsterState==MonsterState::IDLE?"IDLE":"ATK")<<endl;
             monsterState = MonsterState::IDLE;
         }
     }
@@ -360,7 +362,6 @@ void Monster::Update() {
                 }
             }
             if (currentFrame_ == 0) {
-                cout << "IDLEEEEEEEEEEEEEEEEEEEEE" << endl;
                 monsterState == MonsterState::IDLE;
                 
             }
@@ -370,10 +371,12 @@ void Monster::Update() {
 
 void Monster::Draw() {
     frames_[static_cast<int>(monsterState)][currentFrame_]->render(x-100, y-60, NULL, width, height);
+    vector<SDL_Rect> arrowBoundRects = arrowBoundingRect();
+    SDL_SetRenderDrawColor(gRenderer, 200, 0, 0, 100);
+    for (SDL_Rect dangerRect :arrowBoundRects) {
+        SDL_RenderFillRect(gRenderer, &dangerRect);
+    }
     for (int i = 0; i < arrowVector.size(); i++) {
         arrowVector[i]->Draw();
     }
-    SDL_SetRenderDrawColor(renderer, 200, 0, 0, 100);
-    SDL_Rect dRect = { static_cast<int>(x)+25,static_cast<int>(y)+25,35,35 };
-    SDL_RenderFillRect(renderer, &dRect);
 }
