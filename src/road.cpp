@@ -754,7 +754,7 @@ MonsterRoad::MonsterRoad(float timeIdle, float timeArrow, int arrowSpeed, int st
 	this->arrowSpeed = arrowSpeed;
 	this->startY = startY;
 	this->endY = endY;
-	this->archer = new Monster(gRenderer, 0, startY, 288, 128, 5, 1.5, 2000);
+	this->archer = new Monster(gRenderer, 0, startY, 288, 128, 3, 1, 2000);
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	auto nanoseconds = std::chrono::time_point_cast<std::chrono::nanoseconds>(currentTime).time_since_epoch().count();
 
